@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your Account — The Huddle</title>
+    <style>
+        /* --- NEW: Font import to match The Huddle landing page --- */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        /* --- NEW: The Huddle Theme Color Palette --- */
+        :root {
+            --light-bg: #f0f2f5;
+            --dark-text: #2c3e50;
+            --card-bg: #ffffff;
+            --accent1: #005c97; /* Primary Blue */
+            --accent2: #00c9a7; /* Vibrant Teal */
+            --accent1-glow: rgba(0, 92, 151, 0.2);
+            --shadow-color: rgba(0, 92, 151, 0.1);
+            --border-color: #d1d9e2;
+            --placeholder-color: #8a99a8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            border: 1px solid #e1e8f0;
+            overflow: hidden;
+            z-index: 10;
+            margin: 2rem 0;
+        }
+        
+        .header-bar {
+            background: linear-gradient(90deg, var(--accent1), var(--accent2));
+            height: 8px;
+        }
+        
+        .registration-form {
+            padding: 2.5rem;
+        }
+        
+        .form-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            /* NEW: Applying the signature gradient */
+            background: linear-gradient(90deg, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .tagline {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: #556778;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            min-height: 1.5rem;
+        }
+        
+        #dynamic-text {
+            color: var(--accent2);
+            font-weight: 600;
+        }
+        
+        .cursor {
+            display: inline-block;
+            color: var(--accent2);
+            font-weight: 600;
+            animation: blink 1s step-end infinite;
+        }
+        
+        @keyframes blink {
+            from, to { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+        }
+        
+        .form-section h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark-text);
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e1e8f0;
+            padding-bottom: 0.75rem;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-group label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-text);
+        }
+        
+        .form-group label .optional {
+            color: var(--placeholder-color);
+            font-weight: 400;
+        }
+        
+        .form-group label .asterisk {
+            color: var(--accent1);
+            font-weight: 600;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: #f7f9fa;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            color: var(--dark-text);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .form-group select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%238a99a8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        
+        .form-group input::placeholder {
+            color: var(--placeholder-color);
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--accent1);
+            box-shadow: 0 0 0 3px var(--accent1-glow);
+        }
+        
+        .form-group small {
+            font-size: 0.8rem;
+            color: #556778;
+            margin-top: 0.5rem;
+        }
+        
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        
+        .password-wrapper .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--placeholder-color);
+            transition: color 0.2s;
+        }
+        
+        .password-wrapper .toggle-password:hover {
+            color: var(--accent1);
+        }
+        
+        .password-wrapper .toggle-password svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .submit-button {
+            width: 100%;
+            padding: 0.875rem;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(90deg, var(--accent1), var(--accent2));
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 1rem;
+        }
+        
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px var(--shadow-color);
+        }
+        
+        .signin-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .signin-link a {
+            color: var(--accent1);
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .signin-link a:hover {
+            color: var(--accent2);
+            text-decoration: underline;
+        }
+        
+        /* Message Box Styling */
+        #messageBox {
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            z-index: 1000; 
+            padding: 12px 24px; 
+            background-color: #333; 
+            color: white; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+            display: none; 
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            transform: translateY(100%);
+        }
+
+        #messageBox.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #messageBox.success {
+            background-color: var(--accent2);
+        }
+
+        #messageBox.error {
+            background-color: #e74c3c;
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 1rem 0.5rem; align-items: flex-start; }
+            .registration-form { padding: 1.5rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .tagline { font-size: 1rem; }
+            #messageBox { bottom: 10px; right: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header-bar"></div>
+        
+        <form class="registration-form" id="signupForm">
+            <h1 class="form-title">Register</h1>
+            <p class="tagline">
+                Find your team. Build <span id="dynamic-text"></span><span class="cursor">|</span>
+            </p>
+
+            <div class="form-section">
+                <h2>Basic Information</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="fullName">Full Name <span class="asterisk">*</span></label>
+                        <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required aria-describedby="fullNameHelp">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">College Email ID <span class="asterisk">*</span></label>
+                        <input type="email" id="email" name="email" placeholder="Enter your college email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password <span class="asterisk">*</span></label>
+                        <div class="password-wrapper">
+                            <input type="password" id="password" name="password" placeholder="Create a password" required aria-describedby="passwordHelp" minlength="8">
+                            <span class="toggle-password" id="togglePassword">
+                                <svg fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                </svg>
+                            </span>
+                        </div>
+                         <small id="passwordHelp">Minimum 8 characters.</small>
+                         <div id="passwordStrength" style="margin-top: 0.5rem; height: 4px; background: #e1e8f0; border-radius: 2px; overflow: hidden;">
+                             <div id="strengthBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #ff8c8c, #ffd073, var(--accent2)); transition: width 0.3s ease;"></div>
+                         </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password <span class="asterisk">*</span></label>
+                        <div class="password-wrapper">
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                             <span class="toggle-password" id="toggleConfirmPassword">
+                                 <svg fill="currentColor" viewBox="0 0 16 16">
+                                     <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                     <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                 </svg>
+                             </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Academic Information</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="university">University / College Name <span class="asterisk">*</span></label>
+                        <input type="text" id="university" name="university" placeholder="Enter your university name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="branch">Department / Major <span class="asterisk">*</span></label>
+                        <select id="branch" name="branch" required>
+                            <option value="" disabled selected>Select your department</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Electrical Engineering">Electrical Engineering</option>
+                            <option value="Mechanical Engineering">Mechanical Engineering</option>
+                            <option value="Civil Engineering">Civil Engineering</option>
+                            <option value="Business Administration">Business Administration</option>
+                            <option value="Design">Design</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="academicYear">Year of Study <span class="asterisk">*</span></label>
+                        <select id="academicYear" name="academicYear" required>
+                            <option value="" disabled selected>Select your year</option>
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                            <option value="5">5th Year / Post-Grad</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>Skills & Interests</h2>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="skills">Skills <span class="optional">(optional)</span></label>
+                        <input type="text" id="skills" name="skills" placeholder="e.g. Python, React, Machine Learning">
+                        <small>Enter your skills separated by commas.</small>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="submit-button" id="submitBtn">
+                <span id="submitText">Create Account</span>
+                <span id="submitSpinner" style="display: none;">Creating Account...</span>
+            </button>
+            <p class="signin-link">Already have an account? <a href="login.html" id="signInLink">Sign In</a></p>
+        </form>
+    </div>
+
+    <!-- Message box element to replace alert() -->
+    <div id="messageBox"></div>
+
+    <script>
+        // Utility function to display non-blocking messages (replacing alert())
+        function showMessage(message, type = 'info') {
+            const box = document.getElementById('messageBox');
+            box.textContent = message;
+            box.className = ''; // Clear existing classes
+            box.classList.add(type, 'show');
+            box.style.display = 'block';
+
+            setTimeout(() => {
+                box.classList.remove('show');
+                // Hide after transition ends
+                setTimeout(() => box.style.display = 'none', 300); 
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('signupForm');
+            const passwordField = document.getElementById('password');
+            const confirmPasswordField = document.getElementById('confirmPassword');
+
+            // --- Typewriter Effect ---
+            const dynamicText = document.getElementById('dynamic-text');
+            const words = ["your vision.", "the next big thing.", "a prize-winning hack.", "innovative AI.", "the future."];
+            let wordIndex = 0, charIndex = 0, isDeleting = false;
+            function type() { 
+                const currentWord = words[wordIndex]; 
+                const typeSpeed = isDeleting ? 75 : 150; 
+                dynamicText.textContent = currentWord.substring(0, charIndex); 
+                if (!isDeleting && charIndex < currentWord.length) { 
+                    charIndex++; 
+                } else if (isDeleting && charIndex > 0) { 
+                    charIndex--; 
+                } else { 
+                    isDeleting = !isDeleting; 
+                    if (!isDeleting) { 
+                        wordIndex = (wordIndex + 1) % words.length; 
+                    } 
+                } 
+                const pauseTime = !isDeleting && charIndex === currentWord.length ? 2000 : typeSpeed; 
+                setTimeout(type, pauseTime); 
+            }
+            type();
+            
+            // --- Password Visibility Toggles ---
+            const togglePassword = document.querySelector('#togglePassword');
+            const toggleConfirmPassword = document.querySelector('#toggleConfirmPassword');
+            const eyeIconPath = `<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>`;
+            const eyeSlashIconPath = `<path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.284a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829l.822.822zm-3.078-3.078l-1.492-1.492A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 4.156l-12-12-1.414 1.414 12 12 1.414-1.414z"/>`;
+            function toggleVisibility(input, icon) { const type = input.getAttribute('type') === 'password' ? 'text' : 'password'; input.setAttribute('type', type); icon.querySelector('svg').innerHTML = type === 'password' ? eyeIconPath : eyeSlashIconPath; }
+            if(togglePassword && passwordField) { togglePassword.addEventListener('click', function () { toggleVisibility(passwordField, this); }); }
+            if(toggleConfirmPassword && confirmPasswordField) { toggleConfirmPassword.addEventListener('click', function () { toggleVisibility(confirmPasswordField, this); }); }
+            
+            // --- Password Validation & Strength Check ---
+            function validatePasswordMatch() { if (confirmPasswordField.value !== passwordField.value) { confirmPasswordField.setCustomValidity('Passwords do not match'); } else { confirmPasswordField.setCustomValidity(''); } }
+            function checkPasswordStrength() { 
+                const strengthBar = document.getElementById('strengthBar'); 
+                let strength = 0; 
+                if (passwordField.value.length >= 8) strength++; 
+                if (/[a-z]/.test(passwordField.value)) strength++; 
+                if (/[A-Z]/.test(passwordField.value)) strength++; 
+                if (/[0-9]/.test(passwordField.value)) strength++; 
+                if (/[^A-Za-z0-9]/.test(passwordField.value)) strength++; 
+                strengthBar.style.width = (strength / 5) * 100 + '%'; 
+            }
+            if(confirmPasswordField && passwordField) { 
+                confirmPasswordField.addEventListener('input', validatePasswordMatch); 
+                passwordField.addEventListener('input', () => { 
+                    validatePasswordMatch(); 
+                    checkPasswordStrength(); 
+                }); 
+            }
+            
+            // --- Form Submission Handler (Cleaned and updated with user's logic) ---
+            if (form) {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    validatePasswordMatch();
+                    
+                    if (!form.checkValidity()) {
+                        showMessage('Please fill in all required fields correctly.', 'error');
+                        return;
+                    }
+                    
+                    const password = passwordField.value;
+                    const confirmPassword = confirmPasswordField.value;
+                    if (password !== confirmPassword) {
+                        // This should already be handled by validatePasswordMatch() and browser validation, but we keep the redundant check for safety.
+                        showMessage('Passwords do not match.', 'error');
+                        return;
+                    }
+                    
+                    const submitBtn = document.getElementById('submitBtn');
+                    const submitText = document.getElementById('submitText');
+                    const submitSpinner = document.getElementById('submitSpinner');
+                    
+                    submitBtn.disabled = true;
+                    submitText.style.display = 'none';
+                    submitSpinner.style.display = 'inline';
+                    
+                    const formData = new FormData(form);
+                    const data = Object.fromEntries(formData.entries());
+
+                    // Process skills string into an array
+                    data.skills = (data.skills || '')
+                                            .split(',')
+                                            .map(skill => skill.trim())
+                                            .filter(Boolean);
+                    
+                    // Remove confirmPassword field from data sent to API
+                    delete data.confirmPassword;
+
+                    try {
+                        // Using the relative path /signup as requested by the user's preferred logic
+                        const response = await fetch('http://127.0.0.1:5000/signup', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data)
+                        });
+                        
+                        const result = await response.json();
+
+                        if (response.ok && result.success) {
+                            showMessage('Account created! Redirecting to sign in...', 'success');
+                            form.reset();
+                            document.getElementById('strengthBar').style.width = '0%';
+                            
+                            // Redirect after a brief pause
+                            setTimeout(() => {
+                                window.location.href = 'login.html';
+                            }, 1500);
+                        } else {
+                            showMessage(result.error || 'Sign-up failed. Please check your details.', 'error');
+                        }
+
+                    } catch (error) {
+                        console.error('Submission error:', error);
+                        showMessage('Network error. Please try again.', 'error');
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitText.style.display = 'inline';
+                        submitSpinner.style.display = 'none';
+                    }
+                });
+            }
+        });
+    
+    // FIX: Connect signup form to API
+    (function() {
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fullName = document.getElementById('fullName')?.value.trim() || '';
+                const email = document.querySelector('input[type="email"]')?.value.trim() || '';
+                const password = document.querySelectorAll('input[type="password"]')[0]?.value || '';
+                const confirmPassword = document.querySelectorAll('input[type="password"]')[1]?.value || '';
+                const university = document.getElementById('university')?.value.trim() || '';
+                const department = document.getElementById('department')?.value || '';
+                const year = document.getElementById('year')?.value || '';
+                const skills = (document.getElementById('skills')?.value || '').split(',').map(s => s.trim()).filter(s => s);
+
+                if(password !== confirmPassword) {
+                    alert('Passwords do not match');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/signup', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({fullName, email, password, confirmPassword, university, branch: department, academicYear: year, skills})
+                    });
+                    const data = await response.json();
+                    if(data.success) {
+                        alert('Account created! Redirecting to login...');
+                        window.location.href = '/login.html';
+                    } else {
+                        alert(data.error || 'Signup failed');
+                    }
+                } catch(err) {
+                    alert('Error: ' + err.message);
+                }
+            });
+        }
+    })();
+    </script>
+
+</body>
+</html>

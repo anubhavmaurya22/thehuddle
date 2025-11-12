@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Huddle — Log In</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        /* --- Light Theme Color Palette --- */
+        :root {
+            --light-bg: #f0f2f5;
+            --dark-text: #2c3e50;
+            --card-bg: #ffffff;
+            --accent1: #005c97;
+            --accent2: #00c9a7;
+            --shadow-color: rgba(0, 92, 151, 0.1);
+        }
+
+        body { 
+            background: var(--light-bg); 
+            overflow: hidden; 
+            position: relative; 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            color: var(--dark-text); 
+        }
+
+        /* --- Consistent Particle Background --- */
+        #hero-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .login-panel { 
+            width: 90%; 
+            max-width: 400px; 
+            background: var(--card-bg);
+            border-radius: 20px; 
+            padding: 40px; 
+            box-shadow: 0 15px 40px var(--shadow-color);
+            border: 1px solid #e0e0e0;
+            position: relative; 
+            z-index: 10; 
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .login-panel:hover { 
+            transform: translateY(-4px); 
+        }
+        
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { 
+            font-size: 1.8rem; 
+            font-weight: 700; 
+            letter-spacing: 0.5px; 
+            background: linear-gradient(to right, var(--accent1), var(--accent2)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+        
+        .form-group { margin-bottom: 22px; position: relative; }
+        .form-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; transition: color 0.3s ease; }
+        .form-group input { 
+            width: 100%; 
+            padding: 14px 15px 14px 45px; 
+            background: #f7f7f9; 
+            border: 1px solid #ddd; 
+            border-radius: 12px; 
+            color: var(--dark-text); 
+            font-size: 16px; 
+            outline: none; 
+            transition: all 0.3s ease; 
+        }
+        .form-group input:focus { 
+            border-color: var(--accent1); 
+            background: white; 
+            box-shadow: 0 0 0 3px rgba(0, 92, 151, 0.2); 
+        }
+        .form-group input::placeholder { color: #aaa; }
+        .form-group input:focus + i { color: var(--accent1); }
+        
+        .forgot-password { text-align: right; margin-bottom: 24px; }
+        .forgot-password a { color: var(--accent1); text-decoration: none; font-size: 0.87rem; transition: color 0.3s ease; }
+        .forgot-password a:hover { color: var(--accent2); text-decoration: underline; }
+        
+        .submit-btn { 
+            width: 100%; 
+            padding: 14px; 
+            background: linear-gradient(to right, var(--accent1), var(--accent2)); 
+            border: none; 
+            border-radius: 12px; 
+            color: white; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 4px 15px rgba(0, 148, 167, 0.3); 
+            letter-spacing: 0.4px; 
+        }
+        .submit-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(0, 148, 167, 0.45); 
+        }
+        .submit-btn:disabled {
+            background: #ccc;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .signup-link { text-align: center; margin-top: 25px; color: #556778; font-size: 0.87rem; }
+        .signup-link a { color: var(--accent1); text-decoration: none; font-weight: 600; transition: color 0.3s ease; }
+        .signup-link a:hover { color: var(--accent2); text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div id="hero-canvas"></div>
+
+    <div class="login-panel">
+        <div class="header"><h1>Log in to Huddle</h1></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" name="email" id="email" placeholder="Email address" required>
+            </div>
+            
+            <div class="form-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" name="password" id="password" placeholder="Password" required>
+            </div>
+            
+            <div class="forgot-password"><a href="#">Forgot password?</a></div>
+            
+            <button type="submit" class="submit-btn" id="loginBtn">Log In</button>
+        </form>
+        
+        <div class="signup-link">
+            Don't have an account? <a href="sign-up.html">Sign up</a>
+        </div>
+    </div>
+    
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.178.0/build/three.module.js" } }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+
+        // --- Background Particle Animation ---
+        const accent1Color = 0x005c97;
+        const container = document.getElementById('hero-canvas');
+        if (container) {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+            camera.position.z = 5;
+            
+            const particleCount = 5000;
+            const positions = new Float32Array(particleCount * 3);
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 20;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+            }
+            const particlesGeometry = new THREE.BufferGeometry();
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const particleMaterial = new THREE.PointsMaterial({
+                color: accent1Color, size: 0.02, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false
+            });
+            const particles = new THREE.Points(particlesGeometry, particleMaterial);
+            scene.add(particles);
+
+            const mouse = new THREE.Vector2();
+            window.addEventListener('mousemove', (event) => {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            }, false);
+
+            function animate() {
+                requestAnimationFrame(animate);
+                const time = Date.now() * 0.0001;
+                particles.rotation.y = time * 0.5;
+                camera.position.x += (mouse.x * 2 - camera.position.x) * 0.02;
+                camera.position.y += (-mouse.y * 2 - camera.position.y) * 0.02;
+                camera.lookAt(scene.position);
+                renderer.render(scene, camera);
+            };
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        // --- ✅ DATABASE-CONNECTED LOGIN FORM ---
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault(); 
+
+                const loginBtn = document.getElementById('loginBtn');
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                if (!email || !password) {
+                    alert('Please enter both email and password.');
+                    return;
+                }
+                
+                loginBtn.disabled = true;
+                loginBtn.textContent = 'Logging In...';
+
+                try {
+                    // ✅ CONNECTING TO MONGODB ATLAS via Flask Backend
+                    const response = await fetch('http://127.0.0.1:5000/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: email, password: password })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) { 
+                        // ✅ Store user data from MongoDB
+                        localStorage.setItem('huddleUser', JSON.stringify(result.user));
+                        
+                        // Handle team data if exists
+                        if (result.currentTeam) {
+                            localStorage.setItem('currentTeam', JSON.stringify(result.currentTeam));
+                        } else {
+                            localStorage.removeItem('currentTeam'); 
+                        }
+                        
+                        alert(`✅ Welcome ${result.user.fullName}!`);
+                        window.location.href = 'mainpage.html'; // Change to mainpage.html or qa.html
+                    } else { 
+                        alert(`❌ Login Failed: ${result.error}`);
+                    }
+
+                } catch (error) {
+                    console.error('Login error:', error);
+                    alert('❌ Network Error: Make sure Flask server is running at http://127.0.0.1:5000');
+                } finally {
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Log In';
+                }
+            });
+        }
+    
+    // FIX: Connect login form to API
+    (function() {
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const emailInput = document.querySelector('input[type="email"]');
+                const passwordInput = document.querySelector('input[type="password"]');
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+
+                try {
+                    const response = await fetch('/login', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({email, password})
+                    });
+                    const data = await response.json();
+                    if(data.success) {
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                        window.location.href = '/mainpage.html';
+                    } else {
+                        alert(data.error || 'Login failed');
+                    }
+                } catch(err) {
+                    alert('Error: ' + err.message);
+                }
+            });
+        }
+    })();
+    </script>
+</body>
+</html>

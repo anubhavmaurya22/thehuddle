@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>The Huddle — We Craft Connections</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* --- Light Theme Color Palette --- */
+        :root {
+            --light-bg: #f0f2f5;
+            --dark-text: #2c3e50;
+            --card-bg: #ffffff;
+            --accent1: #005c97;
+            --accent2: #00c9a7;
+            --shadow-color: rgba(0, 92, 151, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light-bg);
+            color: var(--dark-text);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            text-wrap: balance;
+        }
+
+        main {
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        
+        section {
+            padding: 8rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h2 {
+            font-weight: 800;
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark-text);
+        }
+
+        p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+            color: #556778;
+        }
+        
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(60px);
+            visibility: hidden;
+        }
+
+        /* --- Header --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .logo { 
+            font-weight: 800; 
+            font-size: 1.5rem; 
+            color: var(--dark-text); 
+            text-decoration: none; 
+        }
+
+        /* --- Auth Buttons --- */
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .auth-btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid var(--accent1);
+        }
+        .auth-btn.login {
+            color: var(--accent1);
+            background: transparent;
+        }
+        .auth-btn.register {
+            color: white;
+            background: var(--accent1);
+        }
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+        .auth-btn.login:hover {
+            background: var(--accent1);
+            color: white;
+        }
+        .auth-btn.register:hover {
+            background: var(--accent2);
+            border-color: var(--accent2);
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-top: 150px;
+        }
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--accent1) 0%, var(--accent2) 50%, var(--accent1) 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-shift 4s linear infinite;
+        }
+        @keyframes gradient-shift {
+            0% { background-position: 0% center; }
+            100% { background-position: -200% center; }
+        }
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 600px;
+        }
+        
+        #hero-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* --- Enhanced Text Styling --- */
+        .highlight {
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        .connection-desc strong,
+        .impact-desc strong,
+        .app-desc strong,
+        .why-desc strong {
+            color: var(--dark-text);
+            font-weight: 600;
+        }
+        .connection-desc em,
+        .impact-desc em,
+        .app-desc em,
+        .why-desc em {
+            font-style: italic;
+            color: var(--accent1);
+        }
+
+        /* --- Section Specific Styles --- */
+        .impact-section {
+            background: #e8eaed; 
+        }
+        .impact-title, .why-title {
+            background: linear-gradient(90deg, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: none; 
+            text-shadow: none;
+        }
+        .highlight-keyword {
+            color: var(--accent1);
+            font-weight: 600;
+        }
+        .glow-text {
+            color: var(--accent2);
+            font-weight: 600;
+            animation: none;
+            text-shadow: none;
+        }
+
+        /* --- Particle Backgrounds --- */
+        .particles-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+        .particle {
+            position: absolute;
+            background: rgba(0, 92, 151, 0.4);
+            border-radius: 50%;
+        }
+        .particle.square {
+            border-radius: 0;
+            background: rgba(0, 201, 167, 0.4);
+        }
+
+        /* --- Cards Container --- */
+        .cards-container, .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        .card-item, .feature-item {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: left;
+        }
+        .card-item:hover, .feature-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px var(--shadow-color);
+        }
+        .card-icon, .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent1);
+            text-shadow: none;
+        }
+        .card-item h3, .feature-item h3 { color: var(--dark-text); }
+        .card-item p, .feature-item p { max-width: none; }
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .feature-icon svg { color: white; }
+
+        /* --- App Layout --- */
+        .app-layout { display: flex; align-items: center; gap: 4rem; margin-top: 3rem; }
+        .app-text {
+            flex: 1;
+            max-width: 500px;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            text-align: left;
+        }
+        .app-text p { font-size: 1.1rem; }
+        .app-mockup { flex: 1; display: flex; justify-content: center; }
+
+        /* --- Dark Theme Phone Mockup --- */
+        .phone-frame-dark {
+            width: 300px;
+            background: #111827;
+            border-radius: 40px;
+            padding: 14px;
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.2),
+                inset 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            aspect-ratio: 9 / 19.5;
+            border: 4px solid #374151;
+            animation: float 6s ease-in-out infinite;
+        }
+         @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+        .phone-screen-dark {
+            width: 100%;
+            height: 100%;
+            background: #1F2937;
+            border-radius: 32px;
+            overflow: hidden;
+            color: #E5E7EB;
+        }
+        .app-ui-dark { padding: 20px; }
+        .app-header-dark {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--accent2);
+            text-align: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .app-content-dark { display: flex; flex-direction: column; gap: 12px; margin-top: 12px;}
+        .app-card-dark {
+            background: #374151;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            border-left: 3px solid var(--accent2);
+        }
+
+        /* --- Final CTA Card (Transparent Background) --- */
+        .final-call {
+            padding: 6rem 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent; /* Fully transparent */
+        }
+
+        .cta-card {
+            position: relative;
+            max-width: 600px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .cta-card h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .cta-card p {
+            font-size: 1rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-btn {
+            background: linear-gradient(90deg, #1d4ed8, #059669);
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 7px 20px rgba(37, 99, 235, 0.4);
+            background: linear-gradient(90deg, #1e40af, #047857);
+        }
+
+        /* Floating Particles */
+        .floating-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle-dot {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #00c9a7;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float-dot 4s ease-in-out infinite;
+        }
+
+        .particle-dot:nth-child(1) { top: 10%; left: 15%; animation-delay: 0s; }
+        .particle-dot:nth-child(2) { top: 25%; right: 10%; animation-delay: 1s; }
+        .particle-dot:nth-child(3) { bottom: 15%; left: 20%; animation-delay: 2s; }
+        .particle-dot:nth-child(4) { bottom: 30%; right: 25%; animation-delay: 3s; }
+        .particle-dot:nth-child(5) { top: 50%; left: 5%; animation-delay: 0.5s; }
+        .particle-dot:nth-child(6) { top: 70%; right: 5%; animation-delay: 1.5s; }
+        .particle-dot:nth-child(7) { bottom: 10%; left: 40%; animation-delay: 2.5s; }
+        .particle-dot:nth-child(8) { bottom: 40%; right: 35%; animation-delay: 3.5s; }
+        .particle-dot:nth-child(9) { top: 80%; left: 30%; animation-delay: 1s; }
+
+        @keyframes float-dot {
+            0% { transform: translate(0, 0); opacity: 0.6; }
+            50% { transform: translate(5px, -5px); opacity: 0.8; }
+            100% { transform: translate(0, 0); opacity: 0.6; }
+        }
+
+        footer { padding: 4rem 2rem 2rem; background: #e8eaed; text-align: center; }
+        
+        @media (max-width: 768px) {
+            h1, h2 { font-size: 2.8rem; }
+            .canvas-container { height: 450px; }
+            .app-layout { flex-direction: column; }
+            .phone-frame-dark { width: 260px; }
+            .cta-card {
+                padding: 2rem 1.5rem;
+            }
+            .cta-card h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="hero-canvas"></div>
+
+    <header>
+        <a href="frontpage.html" class="logo">The Huddle</a>
+        <div class="auth-buttons">
+            <a href="login.html" class="auth-btn login">Login</a>
+            <a href="sign-up.html" class="auth-btn register">Register</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1 class="reveal-up">The Future of Collaboration is Coming.</h1>
+            <p class="reveal-up">We're building Huddle, an intuitive and powerful hub designed to connect you with the perfect collaborators. Get ready to create, innovate, and achieve more, together.</p>
+        </section>
+
+        <section class="meaning">
+            <h2 class="reveal-up">We Don’t Match Profiles.<br><span class="highlight">We Craft Connections.</span></h2>
+            <p class="reveal-up">
+                Huddle isn’t an algorithm—it’s a <strong>human-first ecosystem</strong>.<br>
+                We ignite synergy by weaving together passion, purpose, and trust—<br>
+                transforming strangers into <em>unstoppable collaborators</em>.
+            </p>
+            <div id="team-animation-container" class="canvas-container reveal-up"></div>
+        </section>
+
+        <section class="impact-section">
+            <h2 class="reveal-up impact-title">Drive Real Impact.</h2>
+            <div class="impact-content reveal-up">
+                <p>True collaboration blooms in soil of <span class="highlight-keyword">transparency</span>, 
+                <span class="highlight-keyword">shared vision</span>, and 
+                <span class="highlight-keyword">mutual respect</span>.</p>
+                <p>At Huddle, we don’t just connect people—we cultivate <span class="glow-text">collaborative cultures</span><br>
+                where ideas evolve, teams flourish, and projects become legacies.</p>
+            </div>
+            <div id="impact-particles" class="particles-bg"></div>
+        </section>
+
+        <section class="why-huddle">
+            <div id="why-particles" class="particles-bg"></div>
+            <h2 class="reveal-up why-title">Why Huddle?</h2>
+            <p class="reveal-up why-desc" id="why-desc">
+                We’re not just another platform—we’re a movement. A space where collaboration isn’t forced, but felt.
+                Where trust is earned, ideas are nurtured, and legacies are built—together.
+            </p>
+            <div class="cards-container reveal-up">
+                <div class="card-item">
+                    <div class="card-icon">🔒</div>
+                    <h3>Trust First</h3>
+                    <p>Your safety and privacy come first. Verified profiles, encrypted chats, and community-driven moderation.</p>
+                </div>
+                <div class="card-item">
+                    <div class="card-icon">💡</div>
+                    <h3>Ideas Ignite Here</h3>
+                    <p>From solo sparks to team wildfires—our tools help you turn raw ideas into structured, executable projects.</p>
+                </div>
+                <div class="card-item">
+                    <div class="card-icon">🚀</div>
+                    <h3>Build Legacies, Not Just Projects</h3>
+                    <p>We measure success by the impact you create—not the hours logged. Your next big thing starts here.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="match">
+            <h2 class="reveal-up">Find Your Perfect Team</h2>
+            <p class="reveal-up">Discover and connect with like-minded individuals to form your ideal team. Explore our curated community of creators, innovators, and problem-solvers.</p>
+            <div id="match-animation-container" class="canvas-container reveal-up"></div>
+
+            <div class="feature-grid">
+                <div class="feature-item reveal-up">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                    <h3>1. Discover Talent</h3>
+                    <p>Use smart filters to search for specific skills, interests, or project ideas within our vetted community.</p>
+                </div>
+                <div class="feature-item reveal-up">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                    </div>
+                    <h3>2. Connect Securely</h3>
+                    <p>Review profiles, check shared interests, and initiate conversations through our secure messaging system.</p>
+                </div>
+                <div class="feature-item reveal-up">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <h3>3. Start Building</h3>
+                    <p>Form your team, define your goals, and start bringing your brilliant ideas to life with your new collaborators.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="app-preview">
+            <h2 class="reveal-up">Our App Makes Things<br><span class="highlight">Easy & Accessible.</span></h2>
+            <div class="app-layout reveal-up">
+                <div class="app-text">
+                    <p>With Huddle’s mobile app, connect, collaborate, and create—<br><strong>anytime, anywhere</strong>.</p>
+                    <p>Simple. Intuitive. Built for <em>real human connection</em>.</p>
+                </div>
+                <div class="app-mockup">
+                    <div class="phone-frame-dark">
+                        <div class="phone-screen-dark">
+                            <div class="app-ui-dark">
+                                <div class="app-header-dark">The Huddle</div>
+                                <div class="app-content-dark">
+                                    <div class="app-card-dark">💬 Real-time team chat</div>
+                                    <div class="app-card-dark">👥 Smart collaborator matches</div>
+                                    <div class="app-card-dark">✅ Project progress tracker</div>
+                                    <div class="app-card-dark">🔒 End-to-end encrypted</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="final-call">
+            <div class="cta-card reveal-up">
+                <h2>Great Idea, No Team?</h2>
+                <p>
+                    Don’t let a lack of collaborators stop you from building something amazing.<br>
+                    The Huddle is the dedicated platform for connecting innovators for hackathons and projects.<br>
+                    <strong>Building together starts here.</strong>
+                </p>
+                <button class="cta-btn" onclick="window.location.href='sign-up.html'">Sign up and stop hacking solo</button>
+                <div class="floating-particles">
+                    <div class="particle-dot"></div>
+                    <div class="particle-dot"></div>
+                    <div class="particle-dot"></div>
+                    <div class="particle-dot"></div>
+                    <div class="particle-dot"></div>
+                    <div class="particle-dot"></div>
+                    <div class="particle-dot"></div>
+                    <div class="particle-dot"></div>
+                    <div class="particle-dot"></div>
+                </div>
+            </div>
+        </section>
+        
+        <footer><p>© 2025 The Huddle. All Rights Reserved.</p></footer>
+    </main>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
+
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.178.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.178.0/examples/jsm/" } }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        
+        const accent1Color = 0x005c97;
+        const accent2Color = 0x00c9a7;
+
+        const scenes = [];
+        function initScene(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return null;
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+            const sceneData = { container, scene, camera, renderer, objects: [] };
+            scenes.push(sceneData);
+            return sceneData;
+        }
+        
+        const lenis = new Lenis();
+        gsap.ticker.add((time) => lenis.raf(time * 1000));
+        gsap.ticker.lagSmoothing(0);
+
+        gsap.utils.toArray(".reveal-up").forEach(el => {
+            gsap.fromTo(el,
+                { opacity: 0, y: 60, visibility: "hidden" },
+                { opacity: 1, y: 0, visibility: "visible", duration: 1.2, ease: "power3.out",
+                    scrollTrigger: { trigger: el, start: "top 90%", toggleActions: "play none none none" }
+                }
+            );
+        });
+
+        const heroSceneData = initScene('hero-canvas');
+        if (heroSceneData) {
+            const { scene, camera, container } = heroSceneData;
+            camera.position.z = 5;
+            const particleCount = 5000;
+            const positions = new Float32Array(particleCount * 3);
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 20;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+            }
+            const particlesGeometry = new THREE.BufferGeometry();
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const particleMaterial = new THREE.PointsMaterial({
+                color: accent1Color, size: 0.02, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false
+            });
+            const particles = new THREE.Points(particlesGeometry, particleMaterial);
+            scene.add(particles);
+            const mouse = new THREE.Vector2();
+            window.addEventListener('mousemove', (event) => {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            }, false);
+            heroSceneData.animate = () => {
+                const time = Date.now() * 0.0001;
+                particles.rotation.y = time * 0.5;
+                camera.position.x += (mouse.x * 2 - camera.position.x) * 0.02;
+                camera.position.y += (-mouse.y * 2 - camera.position.y) * 0.02;
+                camera.lookAt(scene.position);
+            };
+        }
+
+        const teamSceneData = initScene('team-animation-container');
+        if (teamSceneData) {
+            const { scene, camera, renderer, container } = teamSceneData;
+            camera.position.z = 10;
+            const nodeCount = 150; 
+            const connectionDistance = 1.8; 
+            const textureLoader = new THREE.TextureLoader();
+            const nodeTexture = textureLoader.load('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABZ0RVh0Q3JlYXRpb24gVGltZQAxMC8xMS8yNfVIMdsAAAAcdEVYdFNvZnR3YXJlAEFkb2JlIEZpcmV3b3JrcyBDUzbovLKMAAAB3ElEQVRYhe2XvUvDUBTFTz0EFSGdi44dCo4O/gMOLi56lxbFwUX8B3FwcVEEd3FwcXAQBB38B3FydHEQRHFydAmCh4giy8s9N4mnaRAf8MDk3ss99+45yXv25s3f2e32VqtVFEW5s21ZljzPO2OM3u/3yWTy5XE8z7Nur9dLLpdj2zZ5nneapgFjrMvlkiiKAk3TfDwecxyXh+OREEKsVisY43AcJ8dx6XQ6SiQSpmn6A8/zsq7r6XQ6VavV5VzH43E2m000TePxeKzruul0umzbtuG/u13XvV6vB4PBh202m43Hg8FgMGzbpt/v5/V6FYvFkv885n+43W4+n09FUVhZlhRF4XA4hBCo1Wp33zEGg8FnYa7r/n6/TyaT6OfzWSwWd4E6Xa/Xy+Xy7L50Op3L5RqNRi1s4vP5/H4/nU7n6fQ6m80mGo0yTdPZ7fYt23b98Xg8Ho/D4bDYbNZut1s1m82w2WwqlUqlUqlUKgXC4XA4HA6Hw+FwqFYqler1+u12G41GkSQJoiiyWq3y+/1eLpe1Wu16vV4ul3u/35e8HMdx4ziurmuaprFYLF5EKa/Xq4jI5/M5j8djjHk+n4/H40KhkM1m+3y+71zKysrKysq+q6w/ABtqNXEbsM58AAAAAElFTkSuQmCC');
+            const nodeGeometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(nodeCount * 3);
+            const velocities = new Float32Array(nodeCount * 3);
+            for(let i=0; i < nodeCount * 3; i++) {
+                positions[i] = (Math.random() - 0.5) * 20;
+                velocities[i] = (Math.random() - 0.5) * 0.02;
+            }
+            nodeGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            nodeGeometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
+            const nodeMaterial = new THREE.PointsMaterial({
+                color: accent2Color, size: 0.3, map: nodeTexture, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false
+            });
+            const nodes = new THREE.Points(nodeGeometry, nodeMaterial);
+            scene.add(nodes);
+            const lineGeometry = new THREE.BufferGeometry();
+            const lineMaterial = new THREE.LineBasicMaterial({ color: accent1Color, transparent: true, opacity: 0.3 });
+            const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+            scene.add(lines);
+            const mouse = new THREE.Vector2();
+            const raycaster = new THREE.Raycaster();
+            const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+            const mousePoint = new THREE.Vector3();
+            container.addEventListener('mousemove', (event) => {
+                const rect = renderer.domElement.getBoundingClientRect();
+                mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+                raycaster.setFromCamera(mouse, camera);
+                raycaster.ray.intersectPlane(plane, mousePoint);
+            });
+            teamSceneData.animate = () => {
+                const pos = nodes.geometry.attributes.position.array;
+                const vel = nodes.geometry.attributes.velocity.array;
+                const connectedVertices = [];
+                for (let i = 0; i < nodeCount; i++) {
+                    const i3 = i * 3;
+                    pos[i3] += vel[i3];
+                    pos[i3+1] += vel[i3+1];
+                    const dx = mousePoint.x - pos[i3];
+                    const dy = mousePoint.y - pos[i3+1];
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 2) {
+                        const force = (2 - dist) * 0.01;
+                        pos[i3] += dx / dist * force;
+                        pos[i3+1] += dy / dist * force;
+                    }
+                    if (pos[i3] > 12 || pos[i3] < -12) vel[i3] *= -1;
+                    if (pos[i3+1] > 8 || pos[i3+1] < -8) vel[i3+1] *= -1;
+                    for (let j = i + 1; j < nodeCount; j++) {
+                        const j3 = j * 3;
+                        const p1 = new THREE.Vector3(pos[i3], pos[i3+1], pos[i3+2]);
+                        const p2 = new THREE.Vector3(pos[j3], pos[j3+1], pos[j3+2]);
+                        if (p1.distanceTo(p2) < connectionDistance) {
+                            connectedVertices.push(p1.x, p1.y, p1.z);
+                            connectedVertices.push(p2.x, p2.y, p2.z);
+                        }
+                    }
+                }
+                lines.geometry.setAttribute('position', new THREE.Float32BufferAttribute(connectedVertices, 3));
+                nodes.geometry.attributes.position.needsUpdate = true;
+            };
+        }
+
+        const matchSceneData = initScene('match-animation-container');
+        if (matchSceneData) {
+            const { scene, camera, renderer, container } = matchSceneData;
+            scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+            const spotlight = new THREE.PointLight(accent2Color, 50, 20, 2);
+            spotlight.position.set(0, 5, 10);
+            scene.add(spotlight);
+            const group = new THREE.Group();
+            scene.add(group);
+            const textureLoader = new THREE.TextureLoader();
+            const alphaMap = textureLoader.load('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAABaklEQVR4nO3OMQEAAADCCog/28/gA46k5QNv2DBgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxYseCFgwYAFCxY......');
+            const imageUrls = [
+                'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=500',
+                'https://images.unsplash.com/photo-1544005313-94ddf0286de2?w=500',
+                'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500',
+                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500',
+                'https://images.unsplash.com/photo-1494790108377-be9c29b2917e?w=500'
+            ];
+            imageUrls.forEach((url, i) => {
+                const material = new THREE.MeshStandardMaterial({ map: textureLoader.load(url), metalness: 0.1, roughness: 0.7, alphaMap: alphaMap, transparent: true });
+                const card = new THREE.Mesh(new THREE.PlaneGeometry(3, 4), material);
+                const angle = (i / imageUrls.length) * Math.PI * 2;
+                card.position.set(Math.cos(angle) * 5, 0, Math.sin(angle) * 5);
+                card.lookAt(0, 0, 0);
+                group.add(card);
+            });
+            camera.position.set(0, 1, 12);
+            let isDragging = false, prevMouseX = 0;
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            let hoveredCard = null;
+            container.addEventListener('mousedown', e => { isDragging = true; prevMouseX = e.clientX; });
+            container.addEventListener('mouseup', () => isDragging = false);
+            container.addEventListener('mouseleave', () => isDragging = false);
+            container.addEventListener('mousemove', e => {
+                if (isDragging) {
+                    group.rotation.y += (e.clientX - prevMouseX) * 0.005;
+                    prevMouseX = e.clientX;
+                }
+                const rect = renderer.domElement.getBoundingClientRect();
+                mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            });
+            matchSceneData.animate = () => {
+                if (!isDragging) group.rotation.y += 0.001;
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(group.children);
+                if (intersects.length > 0) {
+                    const newHovered = intersects[0].object;
+                    if (hoveredCard !== newHovered) {
+                        if(hoveredCard) gsap.to(hoveredCard.scale, {x: 1, y: 1, z: 1, duration: 0.3});
+                        hoveredCard = newHovered;
+                        gsap.to(hoveredCard.scale, {x: 1.1, y: 1.1, z: 1.1, duration: 0.3});
+                    }
+                } else {
+                    if (hoveredCard) gsap.to(hoveredCard.scale, {x: 1, y: 1, z: 1, duration: 0.3});
+                    hoveredCard = null;
+                }
+            };
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            scenes.forEach(data => {
+                if (data.animate) data.animate();
+                data.renderer.render(data.scene, data.camera);
+            });
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            scenes.forEach(data => {
+                data.camera.aspect = data.container.clientWidth / data.container.clientHeight;
+                data.camera.updateProjectionMatrix();
+                data.renderer.setSize(data.container.clientWidth, data.container.clientHeight);
+            });
+        });
+
+        function createParticles(containerId, count = 120) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                if (Math.random() > 0.7) particle.classList.add('square');
+                const size = Math.random() * 2 + 0.5;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                const duration = Math.random() * 10 + 5;
+                const delay = Math.random() * 5;
+                particle.style.animation = `float-particle ${duration}s ease-in-out ${delay}s infinite`;
+                container.appendChild(particle);
+            }
+            if (!document.getElementById('float-particle-style')) {
+                const style = document.createElement('style');
+                style.id = 'float-particle-style';
+                style.textContent = `
+                    @keyframes float-particle {
+                        0% { transform: translate(0, 0) rotate(0deg); opacity: 0.5; }
+                        50% { transform: translate(${(Math.random() - 0.5) * 10}px, ${(Math.random() - 0.5) * 10}px) rotate(180deg); opacity: 0.8; }
+                        100% { transform: translate(0, 0) rotate(360deg); opacity: 0.5; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        function initTypewriter() {
+            const desc = document.getElementById('why-desc');
+            if (!desc) return;
+            const fullText = desc.textContent.trim();
+            desc.textContent = '';
+            let index = 0;
+            function type() {
+                if (index < fullText.length) {
+                    desc.textContent += fullText.charAt(index);
+                    index++;
+                    setTimeout(type, 40);
+                }
+            }
+            gsap.fromTo(desc, { opacity: 0 }, {
+                opacity: 1,
+                duration: 0.5,
+                scrollTrigger: {
+                    trigger: desc,
+                    start: "top 85%",
+                    onEnter: () => setTimeout(type, 300)
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles('impact-particles', 120);
+            createParticles('why-particles', 80);
+            // Removed cta-particles since we now use floating-particles in the card
+            initTypewriter();
+        });
+    </script>
+</body>
+</html>

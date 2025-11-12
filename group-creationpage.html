@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Project Group - The Huddle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            background: white;
+            color: #667eea;
+            border: 2px solid white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-header h1 {
+            font-size: 2rem;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #718096;
+            font-size: 0.85rem;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-btn" onclick="window.location.href='mainpage.html'">← Back to Home</button>
+        
+        <div class="form-card">
+            <div class="form-header">
+                <h1>🚀 Create Project Group</h1>
+                <p>Find teammates for your next amazing project</p>
+            </div>
+
+            <form id="createGroupForm">
+                <div class="form-group">
+                    <label for="projectName">Project Name *</label>
+                    <input type="text" id="projectName" required placeholder="Enter your project name">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description & Objective *</label>
+                    <textarea id="description" required placeholder="Describe your project goals and what you want to achieve"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="teamSize">Preferred Team Size *</label>
+                    <select id="teamSize" required>
+                        <option value="">Select team size</option>
+                        <option value="2">2 members</option>
+                        <option value="3">3 members</option>
+                        <option value="4">4 members</option>
+                        <option value="5">5 members</option>
+                        <option value="6+">6+ members</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="skills">Required Skills *</label>
+                    <input type="text" id="skills" required placeholder="e.g., JavaScript, Python, React, Node.js">
+                    <small>Separate skills with commas</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="timeline">Project Timeline *</label>
+                    <input type="text" id="timeline" required placeholder="e.g., 3 months, 1 semester">
+                </div>
+
+                <div class="form-group">
+                    <label for="contact">Contact Information</label>
+                    <input type="text" id="contact" placeholder="Your email or preferred contact method">
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">Create Group</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:5000';
+        const currentUser = JSON.parse(localStorage.getItem('huddleUser') || '{}');
+
+        if (!currentUser.id) {
+            alert('Please login first!');
+            window.location.href = 'login.html';
+        }
+
+        document.getElementById('createGroupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating Group...';
+
+            const formData = {
+                creatoruserid: currentUser.id,
+                creatorname: currentUser.fullName,
+                project_name: document.getElementById('projectName').value,
+                description_objective: document.getElementById('description').value,
+                preferred_team_size: document.getElementById('teamSize').value,
+                required_skills: document.getElementById('skills').value.split(',').map(s => s.trim()).filter(s => s),
+                project_timeline: document.getElementById('timeline').value,
+                contact_info: document.getElementById('contact').value || currentUser.email
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/creategroup`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('🎉 Group created successfully! Redirecting to groups page...');
+                    window.location.href = 'mainpage.html#groups';
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to create group'));
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Create Group';
+                }
+            } catch (error) {
+                console.error('Error creating group:', error);
+                alert('Failed to create group. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Group';
+            }
+        });
+    
+        // =========== BUG FIX: NAVIGATION (UNIVERSAL) ===========
+        document.addEventListener('DOMContentLoaded', function() {
+            const pageRoutes = {
+                'mainpage': '/mainpage.html',
+                'profile': '/profile.html',
+                'qa': '/qa.html',
+                'discuss': '/discuss-room.html',
+                'groups': '/group-creationpage.html',
+                'notifications': '/notifications.html',
+                'chat': '/chatpage.html'
+            };
+
+            // Fix data-page navigation
+            document.querySelectorAll('[data-page]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    if (pageRoutes[page]) window.location.href = pageRoutes[page];
+                });
+            });
+
+            // Fix logout
+            document.querySelectorAll('[onclick*="logout"], #logoutBtn, .logout-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    localStorage.clear();
+                    window.location.href = '/login.html';
+                });
+            });
+
+            // Fix home/logo link
+            document.querySelectorAll('a[href="#"], a[href=""], .logo, .brand').forEach(link => {
+                if (link.textContent.toLowerCase().includes('huddle') || link.classList.contains('logo')) {
+                    link.style.cursor = 'pointer';
+                    link.addEventListener('click', () => window.location.href = '/mainpage.html');
+                }
+            });
+        });
+
+</script>
+</body>
+</html>

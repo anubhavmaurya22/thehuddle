@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room - The Huddle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Inter, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .chat-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            height: calc(100vh - 40px);
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .room-info h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .room-topic {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .participants-count {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background: #f7fafc;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .message-content {
+            flex: 1;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .message-author {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .message-time {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+        
+        .message-text {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: #2d3748;
+            line-height: 1.5;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            word-wrap: break-word;
+        }
+        
+        .message.own-message {
+            flex-direction: row-reverse;
+        }
+        
+        .message.own-message .message-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        .message.own-message .message-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            color: #718096;
+            font-style: italic;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cbd5e0;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+        
+        .input-container {
+            padding: 20px 30px;
+            background: white;
+            border-top: 2px solid #e2e8f0;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-family: Inter, sans-serif;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .message-input:focus {
+            border-color: #667eea;
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .send-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+        
+        .no-messages {
+            text-align: center;
+            padding: 60px;
+            color: #718096;
+        }
+        
+        .no-messages h3 {
+            margin-bottom: 10px;
+        }
+        
+        .messages-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .messages-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .messages-container::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+        
+        .messages-container::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="header-left">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="room-info">
+                    <h2 id="roomName">Loading...</h2>
+                    <div class="room-topic" id="roomTopic"></div>
+                </div>
+            </div>
+            <div class="participants-count" id="participantsCount">
+                Loading...
+            </div>
+        </div>
+        
+        <div class="messages-container" id="messagesContainer">
+            <div class="loading">Loading messages...</div>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" class="message-input" id="messageInput" 
+                   placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i> Send
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    
+    <script>
+        const API_URL = 'http://127.0.0.1:5000';
+        let currentDiscussion = null;
+        let currentUser = null;
+        let messageRefreshInterval = null;
+        let socket = null;
+        let typingTimer;
+        let isTyping = false;
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', init);
+
+        async function init() {
+            const userStr = localStorage.getItem('huddleUser');
+            if (!userStr) {
+                alert('Please login first!');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            currentUser = JSON.parse(userStr);
+            
+            // Get current discussion from localStorage
+            const discussionStr = localStorage.getItem('currentDiscussion');
+            if (!discussionStr) {
+                alert('No discussion selected!');
+                window.location.href = 'discuss-room.html';
+                return;
+            }
+            
+            currentDiscussion = JSON.parse(discussionStr);
+            
+            // Initialize Socket.IO connection
+            initSocketIO();
+            
+            // Load discussion details and messages
+            await loadDiscussionDetails();
+            loadMessages();
+            
+            // Auto-refresh messages every 3 seconds
+            messageRefreshInterval = setInterval(loadMessages, 3000);
+        }
+
+        function initSocketIO() {
+            if (!currentDiscussion || !currentDiscussion.groupId) {
+                console.error('No group ID for socket connection');
+                return;
+            }
+
+            try {
+                socket = io(API_URL, {
+                    transports: ['websocket', 'polling'],
+                    timeout: 20000
+                });
+
+                socket.on('connect', () => {
+                    console.log('✅ Socket connected:', socket.id);
+                    // Join the discussion room using groupId
+                    socket.emit('joinRoom', currentDiscussion.groupId);
+                });
+
+                socket.on('disconnect', () => {
+                    console.log('❌ Socket disconnected');
+                });
+
+                socket.on('connect_error', (error) => {
+                    console.error('Socket connection error:', error);
+                });
+
+                // Listen for new messages
+                socket.on('newMessage', (message) => {
+                    console.log('📨 New message received:', message);
+                    appendMessage(message);
+                    scrollToBottom();
+                });
+
+                // Typing indicators
+                socket.on('userTyping', (data) => {
+                    if (data.typing && data.user !== currentUser.fullName) {
+                        showTypingIndicator(data.user);
+                    } else {
+                        hideTypingIndicator();
+                    }
+                });
+
+                // Error handling
+                socket.on('error', (error) => {
+                    console.error('Socket error:', error);
+                });
+
+            } catch (error) {
+                console.error('Failed to initialize Socket.IO:', error);
+            }
+        }
+
+        async function loadDiscussionDetails() {
+            document.getElementById('roomName').textContent = currentDiscussion.roomName || 'Chat Room';
+        }
+
+        async function loadMessages() {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = '<div class="loading">Loading messages...</div>';
+            
+            try {
+                const response = await fetch(`${API_URL}/getmessages/${currentDiscussion.discussionId}?userId=${encodeURIComponent(currentUser.id)}`);
+                const data = await response.json();
+                
+                if (data.success && data.messages) {
+                    displayMessages(data.messages);
+                    updateParticipantsCount(data.messages);
+                } else {
+                    container.innerHTML = `
+                        <div class="no-messages">
+                            <i class="fas fa-comments" style="font-size: 3rem; margin-bottom: 20px; color: #cbd5e0;"></i>
+                            <h3>No messages yet</h3>
+                            <p>Be the first to start the conversation!</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                container.innerHTML = `
+                    <div style="text-align:center;padding:40px;color:#ff6b6b">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <div>Error loading messages</div>
+                        <button onclick="loadMessages()" style="margin-top:15px;padding:10px 20px;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Flickerless anti-repaint function
+        function displayMessages(messages) {
+            const container = document.getElementById('messagesContainer');
+            const oldHtml = container.innerHTML;
+            
+            // Get last message ID to check if new content
+            const lastMessageId = container.lastChild ? 
+                container.lastChild.getAttribute('data-id') : null;
+            const lastLoadedId = messages.length > 0 ? 
+                messages[messages.length - 1].messageId : null;
+
+            if (messages.length === 0) {
+                if (oldHtml.indexOf('no-messages') === -1) {
+                    container.innerHTML = `
+                        <div class="no-messages">
+                            <i class="fas fa-comments" style="font-size: 3rem; margin-bottom: 20px; color: #cbd5e0;"></i>
+                            <h3>No messages yet</h3>
+                            <p>Be the first to start the conversation!</p>
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            const html = messages.map(msg => {
+                const isOwnMessage = msg.userId === currentUser.id;
+                const initials = msg.userName ? 
+                    msg.userName.split(' ').map(n => n[0]).join('').toUpperCase() : 'U';
+                const userPhoto = msg.userPhoto || '';
+                
+                return `
+                    <div class="message ${isOwnMessage ? 'own-message' : ''}" data-id="${msg.messageId}">
+                        <div class="message-avatar">
+                            ${userPhoto ? 
+                                `<img src="${userPhoto}" alt="${escapeHtml(msg.userName)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">` : 
+                                `<div>${initials}</div>`
+                            }
+                        </div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-author">${escapeHtml(msg.userName || 'Anonymous')}</span>
+                                <span class="message-time">${formatTime(msg.timestamp)}</span>
+                            </div>
+                            <div class="message-text">${escapeHtml(msg.content)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (container.innerHTML !== html) {
+                container.innerHTML = html;
+            }
+
+            // Scroll to bottom only if new messages arrived or we're already at bottom
+            if (lastLoadedId !== lastMessageId || isAtBottom()) {
+                scrollToBottom();
+            }
+        }
+
+        function appendMessage(message) {
+            const container = document.getElementById('messagesContainer');
+            const isOwnMessage = message.userId === currentUser.id;
+            const initials = message.userName ? 
+                message.userName.split(' ').map(n => n[0]).join('').toUpperCase() : 'U';
+            const userPhoto = message.userPhoto || '';
+
+            const messageHtml = `
+                <div class="message ${isOwnMessage ? 'own-message' : ''}" data-id="${message.messageId}">
+                    <div class="message-avatar">
+                        ${userPhoto ? 
+                            `<img src="${userPhoto}" alt="${escapeHtml(message.userName)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">` : 
+                            `<div>${initials}</div>`
+                        }
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">${escapeHtml(message.userName || 'Anonymous')}</span>
+                            <span class="message-time">${formatTime(message.timestamp)}</span>
+                        </div>
+                        <div class="message-text">${escapeHtml(message.content)}</div>
+                    </div>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', messageHtml);
+            scrollToBottom();
+        }
+
+        function updateParticipantsCount(messages) {
+            const uniqueUsers = new Set(messages.map(m => m.userId));
+            document.getElementById('participantsCount').textContent = 
+                `${uniqueUsers.size} participant${uniqueUsers.size !== 1 ? 's' : ''}`;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+            
+            if (!content) return;
+
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+            try {
+                // Send via Socket.IO first (real-time)
+                if (socket && socket.connected) {
+                    const messageData = {
+                        roomId: currentDiscussion.groupId,
+                        discussionId: currentDiscussion.discussionId,
+                        userId: currentUser.id,
+                        userName: currentUser.fullName,
+                        userPhoto: currentUser.profilePhotoUrl,
+                        content: content,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    socket.emit('sendMessage', messageData);
+                    input.value = '';
+                    
+                    // Also save to database via HTTP as backup
+                    await saveMessageToDatabase(messageData);
+                } else {
+                    // Fallback to HTTP if socket not available
+                    await saveMessageToDatabase({
+                        discussionId: currentDiscussion.discussionId,
+                        userId: currentUser.id,
+                        userName: currentUser.fullName,
+                        userPhoto: currentUser.profilePhotoUrl,
+                        content: content
+                    });
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Failed to send message. Please try again.');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+                input.focus();
+            }
+        }
+
+        async function saveMessageToDatabase(messageData) {
+            try {
+                const response = await fetch(`${API_URL}/sendmessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(messageData)
+                });
+                
+                const data = await response.json();
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to save message');
+                }
+            } catch (error) {
+                console.error('HTTP save error:', error);
+                // Don't show error to user if socket already sent the message
+                if (!socket || !socket.connected) {
+                    throw error;
+                }
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+
+            // Typing indicator
+            handleTypingIndicator();
+        }
+
+        function handleTypingIndicator() {
+            const input = document.getElementById('messageInput');
+            
+            if (input.value.trim().length > 0 && !isTyping) {
+                isTyping = true;
+                if (socket && socket.connected) {
+                    socket.emit('typing', { 
+                        roomId: currentDiscussion.groupId,
+                        user: currentUser.fullName, 
+                        typing: true 
+                    });
+                }
+            }
+
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                if (isTyping) {
+                    isTyping = false;
+                    if (socket && socket.connected) {
+                        socket.emit('typing', { 
+                            roomId: currentDiscussion.groupId,
+                            user: currentUser.fullName, 
+                            typing: false 
+                        });
+                    }
+                    hideTypingIndicator();
+                }
+            }, 1000);
+        }
+
+        function showTypingIndicator(userName) {
+            const container = document.getElementById('messagesContainer');
+            const existingIndicator = container.querySelector('.typing-indicator');
+            
+            if (!existingIndicator && userName) {
+                const indicator = document.createElement('div');
+                indicator.className = 'typing-indicator';
+                indicator.innerHTML = `
+                    <div>
+                        <strong>${escapeHtml(userName)}</strong> is typing...
+                    </div>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                `;
+                container.appendChild(indicator);
+                scrollToBottom();
+            }
+        }
+
+        function hideTypingIndicator() {
+            const container = document.getElementById('messagesContainer');
+            const indicator = container.querySelector('.typing-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        function formatTime(timestamp) {
+            if (!timestamp) return '';
+            
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            
+            return date.toLocaleTimeString([], { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function scrollToBottom() {
+            const container = document.getElementById('messagesContainer');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function isAtBottom() {
+            const container = document.getElementById('messagesContainer');
+            return container.scrollHeight - container.scrollTop <= container.clientHeight + 1;
+        }
+
+        function goBack() {
+            if (messageRefreshInterval) {
+                clearInterval(messageRefreshInterval);
+            }
+            if (socket) {
+                socket.disconnect();
+            }
+            window.location.href = 'discuss-room.html';
+        }
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', () => {
+            if (messageRefreshInterval) {
+                clearInterval(messageRefreshInterval);
+            }
+            if (socket) {
+                socket.emit('typing', { 
+                    roomId: currentDiscussion?.groupId, 
+                    user: currentUser?.fullName, 
+                    typing: false 
+                });
+                socket.disconnect();
+            }
+        });
+
+        // Universal navigation fixes
+        document.addEventListener('DOMContentLoaded', function() {
+            const pageRoutes = {
+                'mainpage': 'mainpage.html',
+                'profile': 'profile.html',
+                'qa': 'qa.html',
+                'discuss': 'discuss-room.html',
+                'groups': 'group-creationpage.html',
+                'notifications': 'notifications.html',
+                'chat': 'chatpage.html'
+            };
+            
+            // Fix data-page navigation
+            document.querySelectorAll('[data-page]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    if (pageRoutes[page]) {
+                        window.location.href = pageRoutes[page];
+                    }
+                });
+            });
+            
+            // Fix logout
+            document.querySelectorAll('onclick="logout()", .logout-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                });
+            });
+            
+            // Fix home/logo link
+            document.querySelectorAll('a[href], .logo, .brand').forEach(link => {
+                if (link.textContent.toLowerCase().includes('huddle')) {
+                    if (!link.classList.contains('logo')) {
+                        link.style.cursor = 'pointer';
+                        link.addEventListener('click', () => window.location.href = 'mainpage.html');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

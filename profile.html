@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - The Huddle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --light-bg: #f0f2f5;
+            --dark-text: #2c3e50;
+            --card-bg: #ffffff;
+            --accent1: #005c97;
+            --accent2: #00c9a7;
+            --shadow-color: rgba(0, 92, 151, 0.1);
+            --border-color: #e5e7eb;
+            --text-color: #556778;
+            --label-color: var(--dark-text);
+            --placeholder-color: #9ca3af;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        #hero-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px 0 var(--shadow-color);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            z-index: 10;
+            position: relative;
+            margin: 2rem 0;
+        }
+
+        .header-bar {
+            background: linear-gradient(90deg, var(--accent1), var(--accent2));
+            height: 10px;
+        }
+
+        .cover-photo-container {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            /* Cursor will be controlled by JS */
+        }
+
+        .cover-photo-container.editable {
+            cursor: pointer;
+        }
+
+        .cover-photo-container.editable:hover {
+            filter: brightness(0.9);
+        }
+
+        .cover-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .cover-photo.active {
+            display: block;
+        }
+
+        .edit-cover-btn {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .edit-cover-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .profile-main {
+            padding: 0 2.5rem 2.5rem;
+            position: relative;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
+            margin-top: -60px;
+            margin-bottom: 2rem;
+        }
+
+        .profile-pic-container {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .profile-pic {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 5px solid var(--card-bg);
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 8px 24px rgba(0, 92, 151, 0.2);
+        }
+
+        .edit-pic-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: var(--accent1);
+            color: white;
+            border: 3px solid var(--card-bg);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 92, 151, 0.3);
+        }
+
+        .edit-pic-btn:hover {
+            background: var(--accent2);
+            transform: scale(1.1);
+        }
+
+        .profile-info-header {
+            flex: 1;
+            padding-top: 80px;
+            position: relative;
+        }
+
+        .profile-name-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-name {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark-text);
+        }
+
+        .edit-name-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--accent1);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .edit-name-btn:hover {
+            background: var(--accent1);
+            color: white;
+            border-color: var(--accent1);
+        }
+
+        .profile-title {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .section {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s;
+        }
+
+        .section:hover {
+            box-shadow: 0 4px 16px rgba(0, 92, 151, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .edit-section-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--accent1);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .edit-section-btn:hover {
+            background: var(--accent1);
+            color: white;
+            border-color: var(--accent1);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--label-color);
+            font-size: 0.95rem;
+        }
+
+        .info-value {
+            color: var(--text-color);
+            text-align: right;
+            font-size: 0.95rem;
+        }
+
+        .bio-text {
+            color: var(--text-color);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .skill-item {
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .skill-item.editable {
+            cursor: pointer;
+        }
+
+        .skill-item.editable:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 92, 151, 0.3);
+        }
+
+        .skill-remove {
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        .interests-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .interest-item {
+            background: var(--light-bg);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--dark-text);
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .interest-item:hover {
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .social-links {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .social-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--light-bg);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--dark-text);
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .social-link:hover {
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            color: white;
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 92, 151, 0.2);
+        }
+
+        .social-link span:first-child {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .social-link span:first-child i {
+            font-size: 1.2rem;
+        }
+
+        .social-link span:last-child {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .social-link:hover span {
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            padding: 2rem 2.5rem;
+            border-top: 1px solid var(--border-color);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 92, 151, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--dark-text);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-bg);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+        
+        /* Class to hide elements */
+        .hidden {
+            display: none !important;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-text);
+        }
+
+        .close {
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s;
+            background: none;
+            border: none;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close:hover {
+            background: var(--light-bg);
+            color: var(--dark-text);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--label-color);
+            font-size: 0.9rem;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            color: var(--dark-text);
+            background: var(--card-bg);
+            transition: all 0.3s;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent1);
+            box-shadow: 0 0 0 3px rgba(0, 92, 151, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+                align-items: center;
+            }
+
+            .profile-info-header {
+                padding-top: 1rem;
+            }
+
+            .profile-name-container {
+                justify-content: center;
+            }
+
+            .profile-main {
+                padding: 0 1.5rem 1.5rem;
+            }
+
+            .action-buttons {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="hero-canvas"></canvas>
+
+    <div class="container">
+        <div class="header-bar"></div>
+
+        <div class="cover-photo-container" id="coverPhotoContainer">
+            <img src="" alt="Cover Photo" class="cover-photo" id="coverPhoto">
+            <input type="file" id="coverInput" accept="image/*" style="display: none;" onchange="uploadCover(this)">
+            <button class="edit-cover-btn hidden">
+                <i class="fas fa-camera"></i> Edit Cover
+            </button>
+        </div>
+
+        <div class="profile-main">
+            <div class="profile-header">
+                <div class="profile-pic-container" id="profilePicContainer">
+                    <div class="profile-pic" id="profilePic">A</div>
+                    <button class="edit-pic-btn hidden">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                    <input type="file" id="picInput" accept="image/*" style="display: none;" onchange="uploadPic(this)">
+                </div>
+
+                <div class="profile-info-header">
+                    <div class="profile-name-container">
+                        <h1 class="profile-name" id="profileNameDisplay">Loading...</h1>
+                        <button class="edit-name-btn hidden" onclick="editNameAndTitle()">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </div>
+                    <p class="profile-title" id="profileTitleDisplay">Loading...</p>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <!-- About Section -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title"><i class="fas fa-user"></i> About Me</h2>
+                        <button class="edit-section-btn hidden" onclick="editAbout()">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </div>
+                    <p class="bio-text" id="bioText">
+                        Loading bio...
+                    </p>
+                </div>
+
+                <!-- Personal Info -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title"><i class="fas fa-info-circle"></i> Personal Info</h2>
+                        <button class="edit-section-btn hidden" onclick="editPersonalInfo()">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email</span>
+                        <span class="info-value" id="emailValue">Loading...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">University</span>
+                        <span class="info-value" id="universityValue">Loading...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Branch</span>
+                        <span class="info-value" id="branchValue">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Academic Info -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title"><i class="fas fa-graduation-cap"></i> Academic Info</h2>
+                        <button class="edit-section-btn hidden" onclick="editAcademicInfo()">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Degree</span>
+                        <span class="info-value" id="degreeValue">Loading...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Year</span>
+                        <span class="info-value" id="academicYearValue">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title"><i class="fas fa-code"></i> Skills</h2>
+                        <button class="edit-section-btn hidden" onclick="addSkill()">
+                            <i class="fas fa-plus"></i> Add Skill
+                        </button>
+                    </div>
+                    <div class="skills-grid" id="skillsGrid">
+                        <!-- Dynamic skills loaded here -->
+                    </div>
+                </div>
+
+                <!-- Interests -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title"><i class="fas fa-heart"></i> Interests</h2>
+                        <button class="edit-section-btn hidden" onclick="editInterests()">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </div>
+                    <div class="interests-grid">
+                        <div class="interest-item">💻 Coding</div>
+                        <div class="interest-item">🌐 Web Dev</div>
+                        <div class="interest-item">📱 App Dev</div>
+                        <div class="interest-item">🤖 AI/ML</div>
+                        <div class="interest-item">🎮 Gaming</div>
+                        <div class="interest-item">📚 Reading</div>
+                    </div>
+                </div>
+
+                <!-- Social Links -->
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title"><i class="fas fa-share-alt"></i> Social Links</h2>
+                        <button class="edit-section-btn hidden" onclick="editSocialLinks()">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </div>
+                    <div class="social-links">
+                        <a href="#" class="social-link" id="githubLink" target="_blank">
+                            <span><i class="fab fa-github"></i> GitHub</span>
+                            <span id="githubUsername">github.com/username</span>
+                        </a>
+                        <a href="#" class="social-link" id="linkedinLink" target="_blank">
+                            <span><i class="fab fa-linkedin"></i> LinkedIn</span>
+                            <span id="linkedinUsername">linkedin.com/in/username</span>
+                        </a>
+                        <a href="#" class="social-link" id="twitterLink" target="_blank">
+                            <span><i class="fab fa-twitter"></i> Twitter</span>
+                            <span id="twitterUsername">@username</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="window.location.href='mainpage.html'">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </button>
+            <button class="btn btn-primary hidden" onclick="saveProfile()">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+            <button class="btn btn-danger hidden" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Edit Information</h2>
+                <button class="close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalBody">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration - CONNECT TO FLASK BACKEND
+        const API_URL = 'http://127.0.0.1:5000'; 
+
+        // Canvas background animation
+        const canvas = document.getElementById('hero-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = Math.random() * 2;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
+                if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 92, 151, 0.3)';
+                ctx.fill();
+            }
+        }
+
+        const particles = Array.from({ length: 50 }, () => new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // --- NEW ---
+        // Step 1: Get the User ID for the profile being viewed
+        function getUserIdForProfile() {
+            // Check URL param first
+            const params = new URLSearchParams(window.location.search);
+            const userIdFromUrl = params.get('userId');
+            if (userIdFromUrl) {
+                console.log(`Found userId in URL: ${userIdFromUrl}`);
+                return userIdFromUrl;
+            }
+
+            // Fallback to logged-in user from localStorage
+            console.log('No userId in URL, falling back to localStorage.');
+            return getCurrentLoggedInUserId(); // Use the renamed function
+        }
+
+        // Renamed from getCurrentUserId to be more specific
+        function getCurrentLoggedInUserId() {
+            try {
+                const user = JSON.parse(localStorage.getItem('huddleUser') || '{}');
+                // Check for all possible ID fields
+                return user.id || user._id || user.userId || null;
+            } catch (e) {
+                console.error('Error parsing user data:', e);
+                return null;
+            }
+        }
+
+        // --- UPDATED ---
+        // Step 2: Update Profile Loader
+        async function loadProfileFromDB() {
+            let profileDataToLoad = null; // Store the loaded profile data
+
+            try {
+                // Use the new helper function to get the correct User ID
+                const profileUserId = getUserIdForProfile();
+                
+                if (!profileUserId) {
+                    console.log('No user ID found, redirecting to login...');
+                    window.location.href = '/login.html'; // <-- FIXED
+                    return;
+                }
+
+                console.log(`Loading profile for userId: ${profileUserId}`);
+                const response = await fetch(`${API_URL}/getuser/${profileUserId}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        profileDataToLoad = data.user;
+                        populateProfile(profileDataToLoad);
+                        localStorage.setItem('huddleProfileData', JSON.stringify(profileDataToLoad));  // Cache full DB data
+                        console.log('✅ Profile loaded from database');
+                    } else {
+                         throw new Error(data.error || 'Failed to load profile from DB');
+                    }
+                } else if (response.status === 404) {
+                    console.log('Profile not found in database, using localStorage fallback');
+                    // Fall through to localStorage fallback
+                } else {
+                    console.error('Error loading profile:', response.statusText);
+                    // Fall through to localStorage fallback
+                }
+            } catch (error) {
+                console.error('Error loading profile from database:', error);
+                // Fall through to localStorage fallback
+            }
+
+            // Fallback to localStorage (only if DB load failed and we are viewing our own profile)
+            if (!profileDataToLoad) {
+                const profileUserId = getUserIdForProfile();
+                const loggedInUserId = getCurrentLoggedInUserId();
+
+                // Only use localStorage fallback if the profile we're trying to view
+                // is our own and the DB call failed.
+                if (profileUserId === loggedInUserId) {
+                    console.log('Using localStorage fallback for own profile.');
+                    let profileData = null;
+                    const savedProfile = localStorage.getItem('huddleProfileData');
+                    const savedUser = localStorage.getItem('huddleUser');
+                    if (savedProfile) {
+                        profileData = JSON.parse(savedProfile);
+                    } else if (savedUser) {
+                        profileData = JSON.parse(savedUser);
+                    }
+                    if (profileData) {
+                        profileDataToLoad = profileData;
+                        populateProfile(profileDataToLoad);
+                    } else {
+                        console.log('No profile data available, redirecting to login');
+                        window.location.href = '/login.html'; // <-- FIXED
+                        return; // Exit
+                    }
+                } else {
+                    // We are viewing someone else's profile and the fetch failed.
+                    // Do not show stale data from localStorage.
+                    console.log('Failed to fetch user profile and not viewing self. Cannot display profile.');
+                    document.getElementById('profileNameDisplay').textContent = 'User Not Found';
+                    document.getElementById('profileTitleDisplay').textContent = '...';
+                    document.getElementById('bioText').textContent = 'Could not load this user\'s profile. They may not exist or an error occurred.';
+                    // Hide all sections
+                    document.querySelectorAll('.section').forEach(sec => sec.classList.add('hidden'));
+                    return; // Exit
+                }
+            }
+
+            // --- NEW ---
+            // Step 3: Secure Editing
+            // This runs after profileDataToLoad is set from either DB or localStorage
+            if (profileDataToLoad) {
+                const loggedInUserId = getCurrentLoggedInUserId();
+                const profileOwnerId = profileDataToLoad.id || profileDataToLoad._id || profileDataToLoad.userId;
+                
+                const isOwner = (loggedInUserId === profileOwnerId);
+                console.log(`Logged in as: ${loggedInUserId}, Viewing profile: ${profileOwnerId}. Is owner? ${isOwner}`);
+                toggleEditControls(isOwner);
+            } else {
+                // Should be covered by "User Not Found" case, but as a fallback, disable all controls.
+                toggleEditControls(false);
+            }
+        }
+
+        // --- NEW ---
+        // Step 3 (Helper): Show/hide all edit controls based on ownership
+        function toggleEditControls(isOwner) {
+            // Get all edit buttons
+            const editButtons = document.querySelectorAll(
+                '.edit-cover-btn, .edit-pic-btn, .edit-name-btn, .edit-section-btn, .btn-primary, .btn-danger'
+            );
+            
+            // Toggle visibility
+            editButtons.forEach(btn => {
+                if (isOwner) {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            });
+
+            // Specific logic for file inputs and remove buttons
+            const coverInput = document.getElementById('coverInput');
+            const picInput = document.getElementById('picInput');
+            const coverContainer = document.getElementById('coverPhotoContainer');
+            const picContainer = document.getElementById('profilePicContainer');
+            
+            if (isOwner) {
+                // Enable cover photo click
+                coverContainer.classList.add('editable');
+                coverContainer.onclick = () => coverInput.click();
+                
+                // Enable profile pic click (via the button)
+                picContainer.querySelector('.edit-pic-btn').onclick = () => picInput.click();
+                
+                // Show skill remove buttons
+                document.querySelectorAll('.skill-remove').forEach(btn => btn.classList.remove('hidden'));
+                
+                // Make skills hoverable/clickable
+                 document.querySelectorAll('.skill-item').forEach(item => item.classList.add('editable'));
+            } else {
+                // Disable cover photo click
+                coverContainer.classList.remove('editable');
+                coverContainer.onclick = null;
+                
+                // Disable profile pic click
+                picContainer.querySelector('.edit-pic-btn').onclick = null;
+
+                // Hide skill remove buttons
+                document.querySelectorAll('.skill-remove').forEach(btn => btn.classList.add('hidden'));
+
+                // Make skills static
+                 document.querySelectorAll('.skill-item').forEach(item => item.classList.remove('editable'));
+            }
+        }
+
+
+        // Populate profile with data (mapped to backend fields; overrides hardcodes)
+        function populateProfile(profileData) {
+            // Name (from fullName)
+            if (profileData.fullName) {
+                document.getElementById('profileNameDisplay').textContent = profileData.fullName;
+                const initial = profileData.fullName.charAt(0).toUpperCase();
+                const profilePic = document.getElementById('profilePic');
+                if (!profilePic.style.backgroundImage || profilePic.style.backgroundImage === 'none') {
+                    profilePic.textContent = initial;
+                }
+            }
+
+            // Title (construct from branch + academicYear)
+            if (profileData.branch || profileData.academicYear) {
+                const title = `${profileData.branch || ''} Student${profileData.academicYear ? ` - ${profileData.academicYear}` : ''}`.trim();
+                document.getElementById('profileTitleDisplay').textContent = title || 'Student Profile';
+            }
+
+            // Bio
+            if (profileData.bio) {
+                document.getElementById('bioText').textContent = profileData.bio;
+            } else {
+                document.getElementById('bioText').textContent = 'Passionate student focused on learning and building innovative projects.';  // DB default
+            }
+
+            // Personal Info (from DB)
+            if (profileData.email) document.getElementById('emailValue').textContent = profileData.email;
+            if (profileData.university) document.getElementById('universityValue').textContent = profileData.university;
+            if (profileData.branch) document.getElementById('branchValue').textContent = profileData.branch;
+
+            // Academic Info (degree hardcoded as it's not in DB; year from academicYear)
+            document.getElementById('degreeValue').textContent = 'BTech Computer Science';  // Add to DB/signup if editable
+            if (profileData.academicYear) document.getElementById('academicYearValue').textContent = profileData.academicYear;
+
+            // Skills (from DB array)
+            const skillsGrid = document.getElementById('skillsGrid');
+            skillsGrid.innerHTML = ''; // Clear defaults
+            if (profileData.skills && Array.isArray(profileData.skills) && profileData.skills.length > 0) {
+                profileData.skills.forEach(skill => {
+                    const skillItem = document.createElement('div');
+                    skillItem.className = 'skill-item'; // 'editable' class added by toggleEditControls
+                    skillItem.innerHTML = `${skill} <button class="skill-remove hidden" onclick="removeSkill(this)">×</button>`;
+                    skillsGrid.appendChild(skillItem);
+                });
+            } else {
+                skillsGrid.innerHTML = '<p class="info-value">No skills listed yet.</p>';
+            }
+
+            // Photos (from DB URLs)
+            if (profileData.profilePhotoUrl) {
+                const profilePic = document.getElementById('profilePic');
+                profilePic.style.backgroundImage = `url(${profileData.profilePhotoUrl})`;
+                profilePic.style.backgroundSize = 'cover';
+                profilePic.style.backgroundPosition = 'center';
+                profilePic.textContent = '';
+            }
+            if (profileData.coverPhotoUrl) {
+                const coverPhoto = document.getElementById('coverPhoto');
+                coverPhoto.src = profileData.coverPhotoUrl;
+                coverPhoto.classList.add('active');
+            }
+
+            // Social links (static/client-only; extend DB if needed)
+            // Defaults remain as-is; update via editSocialLinks() and save locally or add to backend
+        }
+
+        // Update social link href (unchanged)
+        function updateSocialLink(linkId, url) {
+            const link = document.getElementById(linkId);
+            if (!url) {
+                link.href = '#';
+                return;
+            }
+            if (url.startsWith('http')) {
+                link.href = url;
+            } else if (url.startsWith('@')) {
+                link.href = `https://twitter.com/${url.substring(1)}`;
+            } else if (url.includes('github.com')) {
+                link.href = `https://${url}`;
+            } else if (url.includes('linkedin.com')) {
+                link.href = `https://${url}`;
+            } else {
+                link.href = '#';
+            }
+        }
+
+        // Edit functions (updated to use backend fields in saveProfile; local changes only for non-DB fields)
+        function editNameAndTitle() {
+            const currentName = document.getElementById('profileNameDisplay').textContent;
+            const currentTitle = document.getElementById('profileTitleDisplay').textContent;
+            const modalBody = document.getElementById('modalBody');
+            document.getElementById('modalTitle').textContent = 'Edit Name & Title';
+            
+            modalBody.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="editName" placeholder="Enter your full name" value="${currentName}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Title / Headline</label>
+                    <input type="text" class="form-input" id="editTitle" placeholder="e.g., Computer Science Student" value="${currentTitle}">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="saveNameAndTitle()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            `;
+            
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function saveNameAndTitle() {
+            const newName = document.getElementById('editName').value.trim();
+            const newTitle = document.getElementById('editTitle').value.trim();
+            
+            if (newName) {
+                document.getElementById('profileNameDisplay').textContent = newName;
+                const initial = newName.charAt(0).toUpperCase();
+                const profilePic = document.getElementById('profilePic');
+                if (!profilePic.style.backgroundImage || profilePic.style.backgroundImage === 'none') {
+                    profilePic.textContent = initial;
+                }
+            }
+            
+            if (newTitle) {
+                document.getElementById('profileTitleDisplay').textContent = newTitle;
+            }
+            
+            closeModal();
+            showNotification('✅ Name and title updated!');
+            // Trigger full save to DB for fullName
+            saveProfile();
+        }
+
+        function editAbout() {
+            const currentBio = document.getElementById('bioText').textContent.trim();
+            const modalBody = document.getElementById('modalBody');
+            document.getElementById('modalTitle').textContent = 'Edit About Me';
+            
+            modalBody.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">About Me</label>
+                    <textarea class="form-textarea" id="editBio" placeholder="Tell us about yourself...">${currentBio}</textarea>
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="saveBio()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            `;
+            
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function saveBio() {
+            const newBio = document.getElementById('editBio').value;
+            document.getElementById('bioText').textContent = newBio;
+            closeModal();
+            showNotification('✅ About section updated!');
+            saveProfile();  // Sync to DB
+        }
+
+        function editPersonalInfo() {
+            const email = document.getElementById('emailValue').textContent;
+            const university = document.getElementById('universityValue').textContent;
+            const branch = document.getElementById('branchValue').textContent;
+            
+            const modalBody = document.getElementById('modalBody');
+            document.getElementById('modalTitle').textContent = 'Edit Personal Info';
+            
+            modalBody.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="editEmail" value="${email}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">University</label>
+                    <input type="text" class="form-input" id="editUniversity" value="${university}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Branch</label>
+                    <input type="text" class="form-input" id="editBranch" value="${branch}">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="savePersonalInfo()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            `;
+            
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function savePersonalInfo() {
+            document.getElementById('emailValue').textContent = document.getElementById('editEmail').value;
+            document.getElementById('universityValue').textContent = document.getElementById('editUniversity').value;
+            document.getElementById('branchValue').textContent = document.getElementById('editBranch').value;
+            closeModal();
+            showNotification('✅ Personal info updated!');
+            // Note: email/university/branch not updatable in current /updateprofile; extend backend if needed
+            saveProfile();  // For other fields
+        }
+
+        function editAcademicInfo() {
+            const degree = document.getElementById('degreeValue').textContent;
+            const year = document.getElementById('academicYearValue').textContent;
+            
+            const modalBody = document.getElementById('modalBody');
+            document.getElementById('modalTitle').textContent = 'Edit Academic Info';
+            
+            modalBody.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">Degree</label>
+                    <input type="text" class="form-input" id="editDegree" value="${degree}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Year</label>
+                    <input type="text" class="form-input" id="editYear" value="${year}">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="saveAcademicInfo()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            `;
+            
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function saveAcademicInfo() {
+            document.getElementById('degreeValue').textContent = document.getElementById('editDegree').value;
+            document.getElementById('academicYearValue').textContent = document.getElementById('editYear').value;
+            closeModal();
+            showNotification('✅ Academic info updated!');
+            // academicYear can be added to /updateprofile if needed
+            saveProfile();
+        }
+
+        function editSocialLinks() {
+            const github = document.getElementById('githubUsername').textContent;
+            const linkedin = document.getElementById('linkedinUsername').textContent;
+            const twitter = document.getElementById('twitterUsername').textContent;
+            
+            const modalBody = document.getElementById('modalBody');
+            document.getElementById('modalTitle').textContent = 'Edit Social Links';
+            
+            modalBody.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label"><i class="fab fa-github"></i> GitHub</label>
+                    <input type="text" class="form-input" id="editGithub" placeholder="github.com/username" value="${github}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="fab fa-linkedin"></i> LinkedIn</label>
+                    <input type="text" class="form-input" id="editLinkedin" placeholder="linkedin.com/in/username" value="${linkedin}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="fab fa-twitter"></i> Twitter</label>
+                    <input type="text" class="form-input" id="editTwitter" placeholder="@username" value="${twitter}">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="saveSocialLinks()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            `;
+            
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function saveSocialLinks() {
+            const github = document.getElementById('editGithub').value;
+            const linkedin = document.getElementById('editLinkedin').value;
+            const twitter = document.getElementById('editTwitter').value;
+            
+            document.getElementById('githubUsername').textContent = github;
+            document.getElementById('linkedinUsername').textContent = linkedin;
+            document.getElementById('twitterUsername').textContent = twitter;
+            
+            updateSocialLink('githubLink', github);
+            updateSocialLink('linkedinLink', linkedin);
+            updateSocialLink('twitterLink', twitter);
+            
+            closeModal();
+            showNotification('✅ Social links updated!');
+            // Social not in DB; save locally if needed
+        }
+        
+        // No changes to editInterests - it's fine
+        function editInterests() {
+            showNotification('Interests editing coming soon!');
+        }
+
+
+        function addSkill() {
+            const modalBody = document.getElementById('modalBody');
+            document.getElementById('modalTitle').textContent = 'Add New Skill';
+            
+            modalBody.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">Skill Name</label>
+                    <input type="text" class="form-input" id="newSkill" placeholder="e.g., Python, React, etc.">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="saveSkill()">
+                    <i class="fas fa-plus"></i> Add Skill
+                </button>
+            `;
+            
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function saveSkill() {
+            const skillName = document.getElementById('newSkill').value.trim();
+            if (skillName) {
+                // Clear placeholder if it exists
+                const skillsGrid = document.getElementById('skillsGrid');
+                if (skillsGrid.querySelector('p')) {
+                    skillsGrid.innerHTML = '';
+                }
+
+                const skillItem = document.createElement('div');
+                skillItem.className = 'skill-item editable'; // Add editable class
+                skillItem.innerHTML = `
+                    ${skillName} <button class="skill-remove" onclick="removeSkill(this)">×</button>
+                `;
+                skillsGrid.appendChild(skillItem);
+                closeModal();
+                showNotification('✅ Skill added!');
+                saveProfile();  // Sync skills to DB
+            }
+        }
+
+        function removeSkill(button) {
+            // No confirmation needed per original code
+            button.parentElement.remove();
+            showNotification('✅ Skill removed!');
+            saveProfile();  // Sync updated skills to DB
+        }
+
+        function uploadCover(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const coverPhoto = document.getElementById('coverPhoto');
+                    coverPhoto.src = e.target.result;
+                    coverPhoto.classList.add('active');
+                    showNotification('✅ Cover photo updated!');
+                    saveProfile();  // Sync coverPhotoUrl (upload to server first for real URL)
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function uploadPic(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const profilePic = document.getElementById('profilePic');
+                    profilePic.style.backgroundImage = `url(${e.target.result})`;
+                    profilePic.style.backgroundSize = 'cover';
+                    profilePic.style.backgroundPosition = 'center';
+                    profilePic.textContent = '';
+                    showNotification('✅ Profile picture updated!');
+                    saveProfile();  // Sync profilePhotoUrl (upload to server first for real URL)
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Save profile to database (uses backend fields)
+        async function saveProfile() {
+            // Find save button
+            const saveBtn = document.querySelector('.btn-primary[onclick="saveProfile()"]');
+            if (!saveBtn) return; // Not on this page or button not found
+
+            const originalText = saveBtn.innerHTML;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            const skillsElements = document.querySelectorAll('.skill-item');
+            const skills = Array.from(skillsElements).map(el => el.textContent.replace('×', '').trim());
+
+            const profileData = {
+                userId: getCurrentLoggedInUserId(), // Save actions always pertain to the logged in user
+                fullName: document.getElementById('profileNameDisplay').textContent,
+                bio: document.getElementById('bioText').textContent,
+                skills: skills,
+                profilePhotoUrl: document.getElementById('profilePic').style.backgroundImage ? document.getElementById('profilePic').style.backgroundImage.slice(5, -2) : '',  // Base64 or server URL
+                coverPhotoUrl: document.getElementById('coverPhoto').src || '',
+                // university, branch, academicYear, email: Add to backend update if editable
+                // Social/degree/interests: Client-only for now
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/updateprofile`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(profileData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showNotification('✅ Profile saved to database!');
+                    localStorage.setItem('huddleProfileData', JSON.stringify(profileData));
+                } else {
+                    throw new Error(data.error || 'Failed to save profile');
+                }
+            } catch (error) {
+                console.error('Save profile error:', error);
+                showNotification('❌ Network error - saved locally only');
+                localStorage.setItem('huddleProfileData', JSON.stringify(profileData));
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalText;
+            }
+        }
+
+        function logout() {
+            // No confirmation needed per original code
+            localStorage.removeItem('huddleUser');
+            localStorage.removeItem('huddleProfileData');
+            window.location.href = '/login.html'; // <-- FIXED
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(90deg, var(--accent1), var(--accent2));
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 20px rgba(0, 92, 151, 0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                font-weight: 600;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Load profile data on page load (use DOMContentLoaded for reliability)
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProfileFromDB();
+        });
+
+        // =========== BUG FIX: NAVIGATION (UNIVERSAL) ===========
+        // This navigation logic was already present and is unchanged.
+        document.addEventListener('DOMContentLoaded', function() {
+            const pageRoutes = {
+                'mainpage': '/mainpage.html',
+                'profile': '/profile.html',
+                'qa': '/qa.html',
+                'discuss': '/discuss-room.html',
+                'groups': '/group-creationpage.html',
+                'notifications': '/notifications.html',
+                'chat': '/chatpage.html'
+            };
+
+            // Fix data-page navigation
+            document.querySelectorAll('[data-page]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    if (pageRoutes[page]) window.location.href = pageRoutes[page];
+                });
+            });
+
+            // Fix logout (Note: The main logout button is now handled by toggleEditControls)
+            // This targets other potential logout buttons
+            document.querySelectorAll('#logoutBtn, .logout-btn').forEach(btn => {
+                 btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    localStorage.clear();
+                    window.location.href = '/login.html';
+                });
+            });
+
+            // Fix home/logo link
+            document.querySelectorAll('a[href="#"], a[href=""], .logo, .brand').forEach(link => {
+                if (link.textContent.toLowerCase().includes('huddle') || link.classList.contains('logo')) {
+                    link.style.cursor = 'pointer';
+                    link.addEventListener('click', () => window.location.href = '/mainpage.html');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

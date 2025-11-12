@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - The Huddle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --light-bg: #f0f2f5;
+            --dark-text: #2c3e50;
+            --dark-bg: #222f3e;
+            --card-bg: #ffffff;
+            --accent1: #005c97;
+            --accent2: #00c9a7;
+            --border-color: #e5e7eb;
+            --muted: #8899a6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, sans-serif;
+            background: var(--light-bg);
+            color: var(--dark-text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: var(--accent1);
+            color: white;
+            border-color: var(--accent1);
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark-text);
+        }
+
+        .notification-list {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .notification-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s;
+        }
+
+        .notification-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        }
+
+        .notification-card.unread {
+            border-left: 4px solid var(--accent2);
+            background: #f8fdff;
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .notification-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .notification-info {
+            flex: 1;
+        }
+
+        .notification-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .notification-time {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .notification-content {
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--accent1);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #004a77;
+        }
+
+        .btn-secondary {
+            background: var(--light-bg);
+            color: var(--dark-text);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: #e6e9ec;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--accent1);
+        }
+
+        .mark-all-read {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: var(--accent2);
+            color: var(--dark-text);
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,201,167,0.3);
+            transition: all 0.3s;
+            z-index: 100;
+            display: none;
+        }
+
+        .mark-all-read:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,201,167,0.4);
+        }
+
+        .notification-type {
+            display: inline-block;
+            padding: 4px 8px;
+            background: var(--light-bg);
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-left: 8px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .notification-card {
+                margin-bottom: 12px;
+                padding: 16px;
+            }
+            
+            .notification-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .mark-all-read {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                width: calc(100% - 20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="back-btn" id="backBtn">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1 class="page-title">Notifications</h1>
+    </div>
+
+    <div class="notification-list" id="notificationList">
+        <div style="text-align:center;padding:40px;color:#8899a6">
+            Loading notifications...
+        </div>
+    </div>
+
+    <button class="mark-all-read" id="markAllReadBtn" onclick="markAllAsRead()">
+        Mark All as Read
+    </button>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:5000';
+        let currentUser = null;
+        let allNotifications = [];
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const userStr = localStorage.getItem('huddleUser');
+            if (!userStr || !JSON.parse(userStr).id) {
+                alert('Please login first!');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            currentUser = JSON.parse(userStr);
+            loadNotifications();
+            
+            // Back button handler
+            document.getElementById('backBtn').addEventListener('click', () => {
+                window.history.back();
+            });
+        });
+
+        // Load notifications based on user's joined groups
+        async function loadNotifications() {
+            const container = document.getElementById('notificationList');
+            container.innerHTML = `
+                <div style="text-align:center;padding:40px;color:#8899a6">
+                    <i class="fas fa-spinner fa-spin" style="font-size:2rem;margin-bottom:10px;"></i>
+                    Loading notifications...
+                </div>
+            `;
+            
+            try {
+                // First try to get actual notifications from backend
+                let notificationsResponse;
+                try {
+                    notificationsResponse = await fetch(`${API_URL}/getnotifications?userId=${currentUser.id}`);
+                } catch (error) {
+                    console.log('No notifications endpoint, falling back to groups-based notifications');
+                }
+                
+                let notifications = [];
+                
+                if (notificationsResponse && notificationsResponse.ok) {
+                    const notificationsData = await notificationsResponse.json();
+                    if (notificationsData.success && notificationsData.notifications) {
+                        notifications = notificationsData.notifications;
+                        console.log(`✅ Loaded ${notifications.length} backend notifications`);
+                    }
+                }
+                
+                // If no backend notifications or empty, create from joined groups
+                if (notifications.length === 0) {
+                    const groupsResponse = await fetch(`${API_URL}/getavailablegroups?userId=${currentUser.id}`);
+                    const groupsData = await groupsResponse.json();
+                    
+                    if (groupsData.success && groupsData.groups) {
+                        const joinedGroups = groupsData.groups.filter(group => 
+                            group.members && group.members.includes(currentUser.id)
+                        );
+                        
+                        if (joinedGroups.length === 0) {
+                            container.innerHTML = `
+                                <div class="empty-state">
+                                    <i class="fas fa-bell-slash"></i>
+                                    <h3>No notifications</h3>
+                                    <p>You haven't joined any groups yet! Start by browsing available groups.</p>
+                                    <button onclick="window.location.href='mainpage.html'" 
+                                            style="margin-top:15px;padding:12px 24px;background:var(--accent1);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600">
+                                        Browse Groups
+                                    </button>
+                                </div>
+                            `;
+                            return;
+                        }
+                        
+                        // Create comprehensive notifications from groups
+                        notifications = joinedGroups.map(group => {
+                            const joinDate = group.createdAt ? new Date(group.createdAt) : new Date();
+                            const timeAgo = getTimeAgo(joinDate);
+                            const isCreator = group.creatoruserid === currentUser.id;
+                            const memberCount = group.members ? group.members.length : 0;
+                            const maxMembers = group.maxMembers || 0;
+                            const hasNewMembers = memberCount > 1;
+                            
+                            let content = isCreator 
+                                ? `Your group "${group.projectname}" now has ${memberCount} member${memberCount !== 1 ? 's' : ''}`
+                                : `You joined the group "${group.projectname}"`;
+                            
+                            if (hasNewMembers && !isCreator) {
+                                content = `New members joined "${group.projectname}" (${memberCount}/${maxMembers || '∞'})`;
+                            }
+                            
+                            return {
+                                id: `group-${group.groupId}`,
+                                type: 'group',
+                                name: group.projectname,
+                                avatar: group.projectname.substring(0, 2).toUpperCase(),
+                                time: timeAgo,
+                                content: content,
+                                unread: false, // Track read status in localStorage
+                                groupId: group.groupId,
+                                actionUrl: `mainpage.html#group-${group.groupId}`,
+                                createdAt: joinDate
+                            };
+                        });
+                        
+                        // Add some simulated activity notifications
+                        const activityNotifications = [
+                            {
+                                id: 'activity-1',
+                                type: 'activity',
+                                name: 'Platform Update',
+                                avatar: 'HU',
+                                time: '2 hours ago',
+                                content: '🎉 New Q&A features are now live! Try asking your first question.',
+                                unread: true,
+                                actionUrl: 'qa.html',
+                                createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000)
+                            },
+                            {
+                                id: 'activity-2',
+                                type: 'tip',
+                                name: 'Quick Tip',
+                                avatar: '💡',
+                                time: '1 day ago',
+                                content: 'Pro tip: Use tags like #java #python when asking questions to get better answers!',
+                                unread: false,
+                                actionUrl: 'qa.html',
+                                createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000)
+                            }
+                        ];
+                        
+                        notifications = [...activityNotifications, ...notifications];
+                        console.log(`✅ Created ${notifications.length} group-based notifications`);
+                    } else {
+                        throw new Error('Failed to load groups');
+                    }
+                }
+                
+                allNotifications = notifications;
+                renderNotifications(notifications);
+                
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Error loading notifications</h3>
+                        <p>Please check your connection and try again</p>
+                        <button onclick="loadNotifications()" 
+                                style="margin-top:15px;padding:12px 24px;background:var(--accent1);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600">
+                            Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function renderNotifications(notifications) {
+            const container = document.getElementById('notificationList');
+            
+            // Load read status from localStorage
+            const readStatus = JSON.parse(localStorage.getItem(`notifications-read-${currentUser.id}`) || '{}');
+            
+            // Update unread status based on localStorage
+            notifications.forEach(notification => {
+                notification.unread = !readStatus[notification.id];
+            });
+            
+            if (notifications.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-bell-slash"></i>
+                        <h3>No notifications</h3>
+                        <p>You're all caught up! Check back later for updates.</p>
+                        <button onclick="window.location.href='mainpage.html'" 
+                                style="margin-top:15px;padding:12px 24px;background:var(--accent1);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600">
+                            Go to Home
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort by createdAt (most recent first)
+            notifications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            container.innerHTML = notifications.map(notif => {
+                const isUnread = notif.unread;
+                const typeBadge = notif.type === 'group' ? '<span class="notification-type">Group</span>' : 
+                                 notif.type === 'activity' ? '<span class="notification-type">Activity</span>' : 
+                                 '<span class="notification-type">Update</span>';
+
+                return `
+                    <div class="notification-card ${isUnread ? 'unread' : ''}" data-id="${notif.id}">
+                        <div class="notification-header">
+                            <div class="notification-avatar">${escapeHtml(notif.avatar)}</div>
+                            <div class="notification-info">
+                                <div class="notification-name">
+                                    ${escapeHtml(notif.name)}${typeBadge}
+                                </div>
+                                <div class="notification-time">${notif.time}</div>
+                            </div>
+                        </div>
+                        <div class="notification-content">
+                            ${escapeHtml(notif.content)}
+                        </div>
+                        <div class="notification-actions">
+                            <button class="btn btn-primary" onclick="viewNotification('${notif.id}', '${notif.actionUrl || ''}')">
+                                ${notif.actionUrl ? 'View' : 'Dismiss'}
+                            </button>
+                            ${isUnread ? `
+                                <button class="btn btn-secondary mark-read" data-id="${notif.id}" onclick="markAsRead('${notif.id}', event)">
+                                    Mark Read
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Show/hide mark all read button
+            const unreadCount = notifications.filter(n => n.unread).length;
+            const markAllBtn = document.getElementById('markAllReadBtn');
+            if (unreadCount > 0) {
+                markAllBtn.style.display = 'block';
+                markAllBtn.textContent = `Mark All as Read (${unreadCount})`;
+            } else {
+                markAllBtn.style.display = 'none';
+            }
+
+            // Add event listeners for mark read buttons
+            document.querySelectorAll('.mark-read').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const notificationId = this.getAttribute('data-id');
+                    markAsRead(notificationId, e);
+                });
+            });
+
+            // Add click handlers for notification cards
+            document.querySelectorAll('.notification-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (!e.target.closest('.btn')) {
+                        const notificationId = this.getAttribute('data-id');
+                        const actionUrl = notifications.find(n => n.id === notificationId)?.actionUrl;
+                        if (actionUrl) {
+                            viewNotification(notificationId, actionUrl);
+                        }
+                    }
+                });
+            });
+        }
+
+        function viewNotification(notificationId, actionUrl) {
+            // Mark as read
+            markAsRead(notificationId);
+            
+            // Navigate to action URL if provided
+            if (actionUrl) {
+                if (actionUrl.includes('mainpage.html')) {
+                    // For group notifications, store the group ID and navigate
+                    const groupId = actionUrl.split('#group-')[1];
+                    if (groupId) {
+                        localStorage.setItem('selectedGroupId', groupId);
+                        window.location.href = 'mainpage.html';
+                    } else {
+                        window.location.href = actionUrl;
+                    }
+                } else {
+                    window.location.href = actionUrl;
+                }
+            }
+            
+            showNotification('Notification viewed');
+        }
+
+        function markAsRead(notificationId, event) {
+            if (event) event.stopPropagation();
+            
+            // Update local state
+            const notification = allNotifications.find(n => n.id === notificationId);
+            if (notification && notification.unread) {
+                notification.unread = false;
+                
+                // Update localStorage
+                const readStatus = JSON.parse(localStorage.getItem(`notifications-read-${currentUser.id}`) || '{}');
+                readStatus[notificationId] = true;
+                localStorage.setItem(`notifications-read-${currentUser.id}`, JSON.stringify(readStatus));
+                
+                // Re-render to update UI
+                renderNotifications(allNotifications);
+                
+                showNotification('Marked as read');
+            }
+        }
+
+        function markAllAsRead() {
+            const unreadNotifications = allNotifications.filter(n => n.unread);
+            if (unreadNotifications.length === 0) return;
+            
+            // Mark all as read in localStorage
+            const readStatus = JSON.parse(localStorage.getItem(`notifications-read-${currentUser.id}`) || '{}');
+            allNotifications.forEach(notification => {
+                readStatus[notification.id] = true;
+                notification.unread = false;
+            });
+            localStorage.setItem(`notifications-read-${currentUser.id}`, JSON.stringify(readStatus));
+            
+            renderNotifications(allNotifications);
+            showNotification(`Marked ${unreadNotifications.length} notifications as read`);
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--accent1);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                font-weight: 600;
+                transform: translateX(100%);
+                transition: all 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Slide in animation
+            requestAnimationFrame(() => {
+                notification.style.transform = 'translateX(0)';
+            });
+            
+            // Auto remove
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Universal navigation fixes
+        document.addEventListener('DOMContentLoaded', function() {
+            const pageRoutes = {
+                'mainpage': 'mainpage.html',
+                'profile': 'profile.html',
+                'qa': 'qa.html',
+                'discuss': 'discuss-room.html',
+                'groups': 'group-creationpage.html',
+                'notifications': 'notifications.html',
+                'chat': 'chatpage.html'
+            };
+            
+            // Fix data-page navigation
+            document.querySelectorAll('[data-page]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    if (pageRoutes[page]) {
+                        window.location.href = pageRoutes[page];
+                    }
+                });
+            });
+            
+            // Fix logout
+            document.querySelectorAll('onclick="logout()", .logout-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                });
+            });
+            
+            // Fix home/logo link
+            document.querySelectorAll('a[href], .logo, .brand').forEach(link => {
+                if (link.textContent.toLowerCase().includes('huddle')) {
+                    if (!link.classList.contains('logo')) {
+                        link.style.cursor = 'pointer';
+                        link.addEventListener('click', () => window.location.href = 'mainpage.html');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

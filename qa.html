@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>QA - The Huddle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --light-bg: #f0f2f5;
+            --dark-text: #2c3e50;
+            --dark-bg: #222f3e;
+            --card-bg: #ffffff;
+            --accent1: #005c97;
+            --accent2: #00c9a7;
+            --shadow-color: rgba(0, 92, 151, 0.1);
+            --border-color: #e5e7eb;
+            --muted: #8899a6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; font-family: Inter, sans-serif; color: #1a1a1a; overflow-x: hidden; }
+        body { background: var(--light-bg); }
+
+        /* Navigation Sidebar */
+        .nav-sidebar {
+            width: 72px; background: var(--card-bg); border-right: 1px solid var(--border-color);
+            display: flex; flex-direction: column; align-items: center; padding: 28px 0; z-index: 100;
+            position: fixed; height: 100vh; left: 0; top: 0; box-shadow: 5px 0 20px var(--shadow-color);
+            transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .nav-sidebar:hover {
+            width: 240px;
+            background: linear-gradient(180deg, var(--dark-bg) 0%, var(--dark-text) 100%);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.2);
+        }
+        .nav-avatar {
+            position: relative; width: 52px; height: 52px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            display: flex; align-items: center; justify-content: center; margin-bottom: 24px;
+            box-shadow: 0 6px 20px rgba(0, 92, 151, 0.4); cursor: pointer; overflow: hidden; flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        .nav-avatar:hover { transform: scale(1.1); }
+        .nav-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+        .nav-initials {
+            font-size: 20px; font-weight: 700; color: white; text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; align-items: center; justify-content: center;
+        }
+        .nav-items { width: 100%; flex: 1; }
+        .nav-item {
+            position: relative; display: flex; align-items: center; width: 100%; height: 50px; cursor: pointer;
+            margin: 6px 0; padding: 0 24px; overflow: hidden; transition: all 0.3s;
+        }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.1); }
+        .nav-item.active { background: rgba(0, 201, 167, 0.15); }
+        .nav-item.active::before {
+            content: ''; position: absolute; left: 0; width: 4px; height: 100%; background: var(--accent2);
+        }
+        .nav-item i { font-size: 20px; color: var(--accent1); min-width: 24px; transition: all 0.3s; }
+        .nav-sidebar:hover .nav-item i { color: white; }
+        .nav-item:hover i { color: var(--accent2); transform: scale(1.1); }
+        .nav-label { margin-left: 18px; font-size: 15px; font-weight: 600; color: var(--dark-text); white-space: nowrap; opacity: 0; transition: opacity 0.3s; }
+        .nav-sidebar:hover .nav-label { opacity: 1; color: white; }
+        .nav-divider { width: 40px; height: 1px; background: rgba(0, 0, 0, 0.1); margin: 12px auto; transition: all 0.3s; }
+        .nav-sidebar:hover .nav-divider { width: 80%; background: rgba(255, 255, 255, 0.2); }
+
+        /* QA Page Specific Styles */
+        #hero-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .qa-standalone { min-height: 100vh; display: flex; justify-content: center; padding: 24px; margin-left: 72px; box-sizing: border-box; position: relative; z-index: 1; }
+        .qa-container {
+            width: 100%; max-width: 1200px; display: grid; grid-template-columns: 260px 1fr 360px;
+            gap: 22px; align-items: start;
+        }
+        aside.left-panel, aside.right-panel, .ask-card, .q-card {
+            background: rgba(255,255,255,0.85); border-radius: 14px; padding: 14px; box-shadow: 0 2px 8px var(--shadow-color);
+            backdrop-filter: blur(12px);
+        }
+        .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; color: #005c97; font-size: 22px; margin-bottom: 16px; }
+        .about-section { padding: 16px 12px; }
+        .about-title { font-size: 16px; font-weight: 700; color: var(--accent1); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .about-text { font-size: 13px; line-height: 1.6; color: #555; margin-bottom: 16px; }
+        .feature-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; padding: 8px; background: rgba(0, 92, 151, 0.05); border-radius: 8px; transition: all 0.3s; }
+        .feature-item:hover { background: rgba(0, 92, 151, 0.1); transform: translateX(4px); }
+        .feature-icon { font-size: 18px; color: var(--accent2); min-width: 24px; }
+        .feature-text { font-size: 13px; color: #666; line-height: 1.5; }
+        .stats-grid { display: none; }
+        .right-panel { padding: 18px; min-height: 380px; }
+        .feed { display: flex; flex-direction: column; gap: 18px; }
+        .ask-card { display: flex; gap: 12px; align-items: flex-start; }
+        .avatar {
+            width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            display: flex; align-items: center; justify-content: center; font-weight: 700; color: white;
+            position: relative; overflow: hidden; flex-shrink: 0;
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+        .avatar .avatar-initials {
+            position: absolute; width: 100%; height: 100%; display: none; align-items: center; justify-content: center; top: 0; left: 0;
+        }
+        .ask-input { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+        .ask-input input {
+            width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border-color);
+            outline: none; background: rgba(255,255,255,0.8); color: #333; font-family: Inter, sans-serif;
+        }
+        .ask-input input:focus { border-color: var(--accent1); box-shadow: 0 0 0 3px rgba(0, 92, 151, 0.1); }
+        .btn { padding: 8px 12px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; background: transparent; color: #666; }
+        .btn.primary { background: linear-gradient(90deg, #1d4ed8, #059669); color: white; box-shadow: 0 6px 18px rgba(59,130,246,0.2); }
+
+        /* QA Controls */
+        .qa-controls { background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px var(--shadow-color); }
+        .filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        .filter-btn {
+            padding: 10px 20px; border: 2px solid var(--border-color); background: white; border-radius: 25px; cursor: pointer;
+            font-size: 14px; font-weight: 600; transition: all 0.3s; white-space: nowrap;
+        }
+        .filter-btn.active { background: var(--accent2); color: white; border-color: var(--accent2); }
+        .filter-btn:hover:not(.active) { border-color: var(--accent1); }
+        .search-container { position: relative; }
+        .search-container input {
+            width: 100%; padding: 12px 16px 12px 40px; border: 2px solid var(--border-color); border-radius: 10px;
+            background: rgba(255,255,255,0.8); font-size: 14px; outline: none; transition: all 0.3s;
+        }
+        .search-container input:focus { border-color: var(--accent1); background: white; box-shadow: 0 0 0 3px rgba(0, 92, 151, 0.1); }
+        .search-container i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); z-index: 1; }
+        .q-card {
+            display: flex; gap: 14px; padding: 20px; margin-bottom: 16px; border: 1px solid var(--border-color);
+            border-radius: 14px; transition: all 0.3s; background: var(--card-bg); box-shadow: 0 2px 8px var(--shadow-color); cursor: pointer;
+        }
+        .q-card:hover { box-shadow: 0 4px 16px var(--shadow-color); transform: translateY(-2px); }
+        .q-body { flex: 1; }
+        .q-body h3 { margin: 0 0 8px 0; font-size: 16px; color: var(--dark-text); line-height: 1.4; }
+        .q-tags { display: flex; gap: 6px; margin: 12px 0; flex-wrap: wrap; }
+        .tag {
+            background: rgba(0, 92, 151, 0.1); color: var(--accent1); padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tag:hover { background: var(--accent1); color: white; transform: scale(1.05); }
+        .q-meta { color: #666; font-size: 13px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .q-stats { display: flex; gap: 20px; font-size: 12px; color: var(--muted); margin-top: 8px; flex-wrap: wrap; }
+        .q-actions { display: flex; gap: 12px; margin-top: 12px; align-items: center; color: #666; font-weight: 600; font-size: 13px; }
+        .q-actions button {
+            background: transparent; border: none; color: inherit; cursor: pointer; padding: 8px 12px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; gap: 6px; font-size: 13px;
+        }
+        .q-actions button:hover { background: rgba(0, 92, 151, 0.1); color: var(--accent1); }
+        .q-actions button.upvote.liked { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+        .accepted { border-left: 4px solid var(--accent2); background: rgba(0, 201, 167, 0.05); }
+
+        .answer-list {
+            margin-top: 15px; display: flex; flex-direction: column; gap: 10px; padding: 15px; background: rgba(248, 250, 252, 0.8);
+            border-radius: 8px; border: 1px solid var(--border-color);
+        }
+        .answer {
+            background: white; padding: 12px 16px; border-radius: 8px; color: #333; position: relative; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #f1f5f9; transition: all 0.2s; display: flex; gap: 12px; align-items: flex-start;
+        }
+        .answer:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .answer.accepted-answer { border-left: 4px solid var(--accent2); background: rgba(0, 201, 167, 0.1); }
+        .answer-avatar {
+            width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            display: flex; align-items: center; justify-content: center; font-weight: 600; color: white; font-size: 12px; position: relative; overflow: hidden; flex-shrink: 0;
+        }
+        .answer-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+        .answer-avatar .answer-avatar-initials { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; top: 0; left: 0; }
+
+        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 30px; padding: 20px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 2px 8px var(--shadow-color); }
+        .pagination button {
+            padding: 10px 16px; border: 2px solid var(--border-color); background: white; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s;
+        }
+        .pagination button:hover:not(.disabled) { border-color: var(--accent1); background: var(--accent1); color: white; }
+        .pagination button.active { background: var(--accent2); border-color: var(--accent2); color: white; }
+        .pagination button.disabled { opacity: 0.5; cursor: not-allowed; }
+        .page-info { align-self: center; font-size: 14px; color: var(--muted); margin: 0 20px; }
+
+        .no-results { text-align: center; padding: 60px 20px; color: var(--muted); }
+        .no-results i { font-size: 4rem; margin-bottom: 20px; color: #cbd5e0; }
+        .no-results h3 { font-size: 1.5rem; margin-bottom: 10px; color: var(--dark-text); }
+
+        .loading-spinner { margin-right: 8px; }
+        .btn:disabled, input:disabled { opacity: 0.6; cursor: not-allowed !important; }
+
+        @media (max-width: 900px) {
+            .qa-container { grid-template-columns: 1fr; gap: 16px; }
+            aside.left-panel, aside.right-panel { display: none; }
+            .nav-sidebar { width: 60px; }
+            .qa-standalone { margin-left: 60px; padding: 16px; }
+            .filter-tabs { flex-direction: column; }
+            .filter-btn { width: 100%; }
+            .pagination { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="hero-canvas"></canvas>
+
+    <aside class="nav-sidebar">
+        <div class="nav-avatar" onclick="window.location.href='profile.html'">
+            <img id="navAvatarImage" alt="Profile Photo">
+            <div class="nav-initials" id="navInitials">U</div>
+        </div>
+        <nav class="nav-items">
+            <div class="nav-item" data-page="mainpage" onclick="window.location.href='mainpage.html'">
+                <i class="fas fa-home"></i>
+                <span class="nav-label">Home</span>
+            </div>
+            <div class="nav-item" data-page="profile" onclick="window.location.href='profile.html'">
+                <i class="fas fa-user"></i>
+                <span class="nav-label">Profile</span>
+            </div>
+            <div class="nav-item active" data-page="qa" onclick="window.location.href='qa.html'">
+                <i class="fas fa-question-circle"></i>
+                <span class="nav-label">QA</span>
+            </div>
+            <div class="nav-item" data-page="discuss" onclick="window.location.href='discuss-room.html'">
+                <i class="fas fa-comments"></i>
+                <span class="nav-label">Discussions</span>
+            </div>
+            <div class="nav-item" data-page="groups" onclick="window.location.href='group-creationpage.html'">
+                <i class="fas fa-users"></i>
+                <span class="nav-label">Create Group</span>
+            </div>
+            <div class="nav-divider"></div>
+            <div class="nav-item" data-page="notifications" onclick="window.location.href='notifications.html'">
+                <i class="fas fa-bell"></i>
+                <span class="nav-label">Notifications</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='frontpage.html'">
+                <i class="fas fa-info-circle"></i>
+                <span class="nav-label">About</span>
+            </div>
+            <div class="nav-item" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="nav-label">Logout</span>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="qa-standalone">
+        <div class="qa-container">
+            <aside class="left-panel">
+                <div class="brand">
+                    <i class="fas fa-lightbulb"></i>
+                    The Huddle
+                </div>
+                <div class="about-section">
+                    <div class="about-title">
+                        <i class="fas fa-lightbulb"></i>
+                        About Us
+                    </div>
+                    <div class="about-text">
+                        The Huddle is where curiosity meets expertise. Ask questions, share knowledge, 
+                        and connect with a community passionate about learning together.
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-users"></i></div>
+                        <div class="feature-text">
+                            <strong>Learn Together</strong><br>
+                            Collaborate with peers and experts
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="feature-text">
+                            <strong>Get Answers</strong><br>
+                            Real solutions from real people
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-star"></i></div>
+                        <div class="feature-text">
+                            <strong>Build Reputation</strong><br>
+                            Earn recognition for helping others
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="feed">
+                <div class="qa-controls">
+                    <div class="filter-tabs">
+                        <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All Questions</button>
+                        <button class="filter-btn" data-filter="unanswered" onclick="setFilter('unanswered')">Unanswered</button>
+                        <button class="filter-btn" data-filter="most-voted" onclick="setFilter('most-voted')">Most Voted</button>
+                        <button class="filter-btn" data-filter="recent" onclick="setFilter('recent')">Recent</button>
+                    </div>
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search questions, tags, or content..." oninput="handleSearch(this.value)">
+                    </div>
+                </div>
+
+                <div class="ask-card">
+                    <div class="avatar" id="mainAvatar">
+                        <img id="mainAvatarImage" alt="Profile Photo">
+                        <div class="avatar-initials" id="mainAvatarInitials">U</div>
+                    </div>
+                    <div class="ask-input">
+                        <input id="questionInput" type="text" placeholder="Ask your question... (e.g., #Java How to implement DSA?)">
+                        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                            <button class="btn primary" id="askQuestionBtn" onclick="postQuestion()">
+                                <i class="fas fa-plus"></i> Ask Question
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="questionsFeed" class="questions-feed">
+                    <div class="no-results">
+                        <i class="fas fa-comment-slash"></i>
+                        <h3>No questions yet</h3>
+                        <p>Be the first to ask a question! Your question will inspire others to join the conversation.</p>
+                    </div>
+                </div>
+
+                <div class="pagination" id="pagination" style="display: none;">
+                    <button class="page-btn" onclick="changePage(-1)" id="prevBtn"><i class="fas fa-chevron-left"></i> Previous</button>
+                    <div class="page-info" id="pageInfo">Page 1 of 1</div>
+                    <button class="page-btn" onclick="changePage(1)" id="nextBtn">Next <i class="fas fa-chevron-right"></i></button>
+                </div>
+            </main>
+
+            <aside class="right-panel">
+                <h4 style="margin-bottom: 15px; color: #005c97; font-weight: 700;">
+                    <i class="fas fa-fire"></i> Trending Topics
+                </h4>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="trending-item" onclick="searchByTopic('Java')" style="cursor: pointer; padding: 10px; background: rgba(0,92,151,0.05); border-radius: 8px; transition: all 0.2s;">
+                        <span style="font-weight: 600; color: var(--accent1);">#Java</span>
+                        <span style="font-size: 12px; color: var(--muted);"></span>
+                    </div>
+                    <div class="trending-item" onclick="searchByTopic('Python')" style="cursor: pointer; padding: 10px; background: rgba(0,92,151,0.05); border-radius: 8px; transition: all 0.2s;">
+                        <span style="font-weight: 600; color: var(--accent1);">#Python</span>
+                        <span style="font-size: 12px; color: var(--muted);"></span>
+                    </div>
+                    <div class="trending-item" onclick="searchByTopic('WebDevelopment')" style="cursor: pointer; padding: 10px; background: rgba(0,92,151,0.05); border-radius: 8px; transition: all 0.2s;">
+                        <span style="font-weight: 600; color: var(--accent1);">#WebDevelopment</span>
+                        <span style="font-size: 12px; color: var(--muted);"></span>
+                    </div>
+                    <div class="trending-item" onclick="searchByTopic('Android')" style="cursor: pointer; padding: 10px; background: rgba(0,92,151,0.05); border-radius: 8px; transition: all 0.2s;">
+                        <span style="font-weight: 600; color: var(--accent1);">#Android</span>
+                        <span style="font-size: 12px; color: var(--muted);"></span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const DEBUG = false;
+
+        // --- Utility Functions ---
+
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                const context = this;
+                const later = () => { clearTimeout(timeout); func.apply(context, args); };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function getTimeAgo(timestamp) {
+            if (!timestamp) return 'Unknown time';
+            let date;
+            try {
+                date = new Date(timestamp);
+                if (isNaN(date.getTime())) return 'Just now';
+            } catch (e) { return 'Just now'; }
+            const now = new Date();
+            const diffMs = now.getTime() - date.getTime();
+            if (diffMs < 0) return "Just now";
+            const diffSeconds = Math.floor(diffMs / 1000);
+            if (diffSeconds < 10) return 'Just now';
+            if (diffSeconds < 60) return `${diffSeconds}s ago`;
+            const diffMinutes = Math.floor(diffSeconds / 60);
+            if (diffMinutes < 60) return `${diffMinutes}m ago`;
+            const diffHours = Math.floor(diffMinutes / 60);
+            if (diffHours < 24) return `${diffHours}h ago`;
+            const diffDays = Math.floor(diffHours / 24);
+            if (diffDays < 7) return `${diffDays}d ago`;
+            if (diffDays < 30) return `${Math.floor(diffDays/7)}w ago`;
+            if (diffDays < 365) return `${Math.floor(diffDays/30)}mo ago`;
+            const diffYears = Math.floor(diffDays / 365);
+            return `${diffYears}y ago`;
+        }
+
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Image URL validation (accepts data:, blob:, and http(s) without requiring file extensions)
+        function isLikelyImageUrl(url) {
+            if (!url) return false;
+            const t = url.trim();
+            if (t.startsWith('data:image/')) return true;
+            if (t.startsWith('blob:')) return true;
+            try {
+                const u = new URL(t, window.location.href);
+                return u.protocol === 'http:' || u.protocol === 'https:';
+            } catch { return false; }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            const bgColor = type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#10b981';
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: 20px; background: ${bgColor}; color: white; padding: 12px 20px;
+                border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; font-weight: 600; max-width: 300px;
+                word-wrap: break-word; transform: translateX(100%); transition: all 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            requestAnimationFrame(() => { notification.style.transform = 'translateX(0)'; });
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+
+        // --- Global State & Initialization ---
+        const API_URL = 'http://127.0.0.1:5000'; // Backend base URL
+
+        let currentUser = null;
+        let allQuestions = [];
+        let currentFilter = 'all';
+        let currentSearch = '';
+        let currentPage = 1;
+        const QUESTIONS_PER_PAGE = 5;
+        const userLikes = new Set();
+        let totalPages = 1;
+        let totalQuestionsCount = 0;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await initializeApp();
+            initCanvas();
+        });
+
+        async function initializeApp() {
+            const userStr = localStorage.getItem('huddleUser');
+            if (!userStr) {
+                alert('Please login first!');
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = JSON.parse(userStr);
+
+            const likesStr = localStorage.getItem(`userLikes_${currentUser.id}`);
+            if (likesStr) { JSON.parse(likesStr).forEach(id => userLikes.add(id)); }
+
+            updateUserInterface();
+            await loadQuestions();
+            setupEventListeners();
+            autoDetectActivePage();
+        }
+
+        // Unified avatar handling for nav + ask-card
+        function updateUserInterface() {
+            if (!currentUser) return;
+
+            const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+            const profilePhotoUrl = currentUser.profilePhotoUrl;
+
+            const setAvatar = (imgId, initialsId) => {
+                const img = document.getElementById(imgId);
+                const initialsDiv = document.getElementById(initialsId);
+                if (initialsDiv) initialsDiv.textContent = initials;
+
+                if (isLikelyImageUrl(profilePhotoUrl)) {
+                    if (img) {
+                        img.src = profilePhotoUrl;
+                        img.alt = currentUser.fullName + " avatar";
+                        img.style.display = "block";
+                        img.onerror = () => { img.style.display = "none"; if (initialsDiv) initialsDiv.style.display = "flex"; };
+                        img.onload  = () => { img.style.display = "block"; if (initialsDiv) initialsDiv.style.display = "none"; };
+                    }
+                    if (initialsDiv) initialsDiv.style.display = "none";
+                } else {
+                    if (img) img.style.display = "none";
+                    if (initialsDiv) initialsDiv.style.display = "flex";
+                }
+            };
+
+            // Nav avatar
+            setAvatar('navAvatarImage', 'navInitials');
+            // Ask-card avatar (use the initials element id, not the container)
+            setAvatar('mainAvatarImage', 'mainAvatarInitials');
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => setFilter(btn.dataset.filter));
+            });
+
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce((value) => { handleSearch(value); }, 300));
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const topic = urlParams.get('topic');
+            if (topic) {
+                currentSearch = topic;
+                document.getElementById('searchInput').value = topic;
+                loadQuestions();
+            }
+
+            const feed = document.getElementById('questionsFeed');
+            feed.addEventListener('click', (e) => {
+                const upvoteBtn = e.target.closest('.upvote');
+                if (upvoteBtn) {
+                    const card = upvoteBtn.closest('.q-card');
+                    const index = card.dataset.index;
+                    const questionId = allQuestions[index].questionId;
+                    handleVote(questionId, 'up');
+                    return;
+                }
+                const answersBtn = e.target.closest('.toggle-answers');
+                if (answersBtn) {
+                    const card = answersBtn.closest('.q-card');
+                    const index = card.dataset.index;
+                    const questionId = allQuestions[index].questionId;
+                    toggleAnswers(questionId);
+                    return;
+                }
+                const acceptBtn = e.target.closest('.accept-answer-btn');
+                if (acceptBtn) {
+                    e.preventDefault(); e.stopPropagation();
+                    const qId = acceptBtn.dataset.questionId;
+                    const aId = acceptBtn.dataset.answerId;
+                    acceptAnswer(qId, aId);
+                    return;
+                }
+                const answerVoteBtn = e.target.closest('.answer-content button');
+                if (answerVoteBtn) { e.preventDefault(); e.stopPropagation(); }
+                const postAnswerBtn = e.target.closest('.post-answer-btn');
+                if (postAnswerBtn) {
+                    const card = postAnswerBtn.closest('.q-card');
+                    const index = card.dataset.index;
+                    const questionId = allQuestions[index].questionId;
+                    addAnswer(questionId);
+                    return;
+                }
+            });
+        }
+
+        async function loadQuestions() {
+            const feed = document.getElementById('questionsFeed');
+            feed.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--accent1); margin-bottom: 20px;"></i>
+                    <h3>Loading questions...</h3>
+                    <p>Fetching questions from database</p>
+                </div>
+            `;
+            document.getElementById('pagination').style.display = 'none';
+
+            try {
+                const params = new URLSearchParams({ filter: currentFilter, search: currentSearch, page: currentPage, limit: QUESTIONS_PER_PAGE });
+                const response = await fetch(`${API_URL}/getquestions?${params}`);
+                if (!response.ok) {
+                    const errorDetails = await response.json().catch(() => ({}));
+                    throw new Error(errorDetails.error || `HTTP error! Status: ${response.status}`);
+                }
+                const result = await response.json();
+
+                if (result.success) {
+                    allQuestions = result.questions || [];
+                    totalPages = result.pagination?.totalPages || 1;
+                    totalQuestionsCount = result.pagination?.totalItems || 0;
+                    renderQuestions();
+                    updatePagination();
+                    if (DEBUG) console.log(`Loaded ${allQuestions.length} questions (Page ${currentPage} of ${totalPages}, Total: ${totalQuestionsCount})`);
+                } else {
+                    throw new Error(result.error || 'Failed to load questions');
+                }
+            } catch (error) {
+                if (DEBUG) console.error('Load questions error:', error);
+                feed.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 20px;"></i>
+                        <h3>Error loading questions</h3>
+                        <p>Unable to fetch questions from server. Please check your connection. (${escapeHtml(error.message)})</p>
+                        <button class="btn primary" onclick="loadQuestions()" style="margin-top: 15px; padding: 12px 24px;">
+                            <i class="fas fa-sync-alt"></i> Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            currentPage = 1;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === filter);
+            });
+            loadQuestions();
+        }
+
+        function handleSearch(query) {
+            currentSearch = query.trim();
+            currentPage = 1;
+            if (currentSearch) {
+                currentFilter = 'all';
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.filter === 'all');
+                });
+            }
+            loadQuestions();
+        }
+
+        function renderQuestions() {
+            const feed = document.getElementById('questionsFeed');
+            if (totalQuestionsCount === 0) {
+                feed.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-comment-slash" style="font-size: 3rem; margin-bottom: 20px; color: #cbd5e0;"></i>
+                        <h3>No questions found</h3>
+                        <p>${currentSearch ? `No questions match "${escapeHtml(currentSearch)}". Try different keywords.` : 'Be the first to ask a question!'}</p>
+                        ${currentSearch ? 
+                            `<button class="btn primary" onclick="clearSearch()" style="margin-top: 15px; padding: 12px 24px;">
+                                <i class="fas fa-search-minus"></i> Clear Search
+                            </button>` : ''
+                        }
+                    </div>
+                `;
+                document.getElementById('pagination').style.display = 'none';
+                return;
+            }
+            const htmlContent = allQuestions.map((q, index) => createQuestionCard(q, index)).join('');
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            feed.innerHTML = '';
+            while (tempDiv.firstChild) feed.appendChild(tempDiv.firstChild);
+        }
+
+        function createQuestionCard(q, index) {
+            const questionId = q.questionId;
+            const userInitials = q.userName ? q.userName.split(' ').map(n => n[0]).join('').toUpperCase() : 'U';
+            const timeAgo = getTimeAgo(q.createdAt);
+            const isLiked = userLikes.has(questionId);
+            const likedClass = isLiked ? 'liked' : '';
+            const voteCount = q.votes || 0;
+            const answerCount = q.answers ? q.answers.length : 0;
+            const hasAccepted = q.answers && q.answers.some(a => a.accepted);
+            const viewCount = q.views || 0;
+
+            const sortedAnswers = q.answers ? [...q.answers].sort((a, b) => {
+                if (a.accepted !== b.accepted) return b.accepted ? -1 : 1;
+                return (b.votes || 0) - (a.votes || 0);
+            }) : [];
+
+            const userPhotoUrl = q.userPhoto || '';
+            const avatarHtml = isLikelyImageUrl(userPhotoUrl) 
+                ? `<img src="${escapeHtml(userPhotoUrl)}" alt="${escapeHtml(q.userName)} avatar"
+                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                      onload="this.style.display='block'; this.nextElementSibling.style.display='none';">
+                   <div class="avatar-initials" style="display:none;">${userInitials}</div>`
+                : `<div class="avatar-initials" style="display:flex;">${userInitials}</div>`;
+
+            const isLoggedIn = !!currentUser;
+            const currentUserPhoto = currentUser?.profilePhotoUrl || '';
+            const currentUserInitials = currentUser?.fullName?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U';
+
+            let answerFormAvatarHtml = '';
+            if (isLoggedIn) {
+                const isCurrentUserPhotoValid = isLikelyImageUrl(currentUserPhoto);
+                const avatarImageHtml = isCurrentUserPhotoValid ?
+                    `<img src="${escapeHtml(currentUserPhoto)}" alt="${escapeHtml(currentUser.fullName)} avatar"
+                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                          onload="this.style.display='block'; this.nextElementSibling.style.display='none';">`
+                    : '';
+                answerFormAvatarHtml = `<div class="answer-avatar" style="width: 28px; height: 28px; font-size: 10px;">
+                    ${avatarImageHtml}
+                    <div class="answer-avatar-initials" style="display: ${isCurrentUserPhotoValid ? 'none' : 'flex'};">${currentUserInitials}</div>
+                </div>`;
+            }
+
+            const toggleButtonText = answerCount === 0
+                ? "Add Answer"
+                : (document.getElementById(`answers-${questionId}`)?.style.display === 'block'
+                    ? 'Hide Answers'
+                    : `View ${answerCount} Answer${answerCount !== 1 ? 's' : ''}`);
+
+            return `
+                <div class="q-card ${hasAccepted ? 'accepted' : ''}" data-index="${index}">
+                    <div class="avatar">${avatarHtml}</div>
+                    <div class="q-body">
+                        <h3>${escapeHtml(q.title)}</h3>
+                        ${q.content ? `<p style="color: #666; margin: 8px 0 12px 0; line-height: 1.5;">${escapeHtml(q.content)}</p>` : ''}
+                        ${q.tags && q.tags.length > 0 ? `
+                            <div class="q-tags">
+                                ${q.tags.map(tag => `<span class="tag" onclick="searchByTag(event, '${escapeHtml(tag)}')">#${escapeHtml(tag)}</span>`).join('')}
+                            </div>` : ''}
+                        <div class="q-meta">
+                            <span style="color: var(--accent1); font-weight: 600;">${escapeHtml(q.userName)}</span>
+                            <i class="fas fa-circle" style="font-size: 4px; color: #ccc; margin: 0 8px;"></i>
+                            <span>${timeAgo}</span>
+                        </div>
+                        <div class="q-stats">
+                            <span><i class="fas fa-eye" style="font-size: 10px; margin-right: 4px;"></i>${viewCount} views</span>
+                            <span><i class="fas fa-comment" style="font-size: 10px; margin-right: 4px;"></i>${answerCount} answers</span>
+                            <span><i class="fas fa-thumbs-up" style="font-size: 10px; margin-right: 4px; color: var(--accent1);"></i>${voteCount} votes</span>
+                        </div>
+                        <div class="q-actions">
+                            <button class="upvote ${likedClass}" ${!isLoggedIn ? 'disabled' : ''}>
+                                <i class="fas fa-heart"></i> ${isLiked ? 'Unlike' : 'Like'} (${voteCount})
+                            </button>
+                            <button class="toggle-answers" type="button">
+                                <i class="fas fa-comment"></i> ${toggleButtonText}
+                            </button>
+                        </div>
+                        <div id="answer-form-${questionId}" style="margin-top: 15px; padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            ${isLoggedIn ? `
+                                <div class="meta" style="margin-bottom: 8px; font-size: 12px; color: #666; display: flex; align-items: center; gap: 8px;">
+                                    ${answerFormAvatarHtml}
+                                    <span>Reply as ${escapeHtml(currentUser.fullName)}</span>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <input class="answer-input" placeholder="Write your answer..."
+                                           style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; font-family: Inter, sans-serif; font-size: 14px;"
+                                           data-question-id="${questionId}">
+                                    <button class="btn primary post-answer-btn" style="padding: 10px 16px;">
+                                        <i class="fas fa-reply"></i> Post Answer
+                                    </button>
+                                </div>
+                            ` : `
+                                <div style="text-align: center; padding: 20px; color: var(--muted); border: 2px dashed #e2e8f0; border-radius: 8px;">
+                                    <i class="fas fa-sign-in-alt" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                                    <p>Login to answer this question</p>
+                                    <button class="btn primary" onclick="window.location.href='login.html'" style="margin-top: 10px;">
+                                        Login
+                                    </button>
+                                </div>
+                            `}
+                        </div>
+                        <div class="answer-list" id="answers-${questionId}" style="display: none; margin-top: 15px;">
+                            ${sortedAnswers.length > 0 ? sortedAnswers.map(a => createAnswerCard(a, questionId, q.userId)).join('') : '<p style="text-align: center; color: #666; padding: 20px;">No answers yet. Be the first to answer!</p>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createAnswerCard(answer, questionId, questionOwnerId) {
+            const isAccepted = answer.accepted;
+            const voteCount = answer.votes || 0;
+            const isQuestionOwner = currentUser && currentUser.id === questionOwnerId;
+            const canAccept = currentUser && !isAccepted && isQuestionOwner;
+            const isLoggedIn = !!currentUser;
+
+            const userPhotoUrl = answer.userPhoto || '';
+            const userInitials = answer.userName ? answer.userName.split(' ').map(n => n[0]).join('').toUpperCase() : 'U';
+            const isAnswererPhotoValid = isLikelyImageUrl(userPhotoUrl);
+            const avatarImageHtml = isAnswererPhotoValid ?
+                `<img src="${escapeHtml(userPhotoUrl)}" alt="${escapeHtml(answer.userName)} avatar"
+                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                      onload="this.style.display='block'; this.nextElementSibling.style.display='none';">` : '';
+            const avatarHtml = `${avatarImageHtml}
+                <div class="answer-avatar-initials" style="display: ${isAnswererPhotoValid ? 'none' : 'flex'};">${userInitials}</div>`;
+
+            return `
+                <div class="answer ${isAccepted ? 'accepted-answer' : ''}" data-answer-id="${answer.answerId}">
+                    <div class="answer-avatar">${avatarHtml}</div>
+                    <div class="answer-content">
+                        <div class="meta">
+                            <span style="font-weight: 600; color: var(--dark-text);">${escapeHtml(answer.userName)}</span>
+                            <span style="color: #666;">• ${getTimeAgo(answer.createdAt)}</span>
+                            ${isAccepted ? `<span style="margin-left: auto; color: var(--accent2); font-weight: 700;"><i class="fas fa-check-circle"></i> Accepted</span>` : ''}
+                            ${canAccept ? `
+                                <button class="small-btn accept-answer-btn" data-question-id="${questionId}" data-answer-id="${answer.answerId}" style="margin-left: auto; color: var(--accent2);">
+                                    <i class="fas fa-check-circle"></i> Accept Answer
+                                </button>` : ''}
+                        </div>
+                        <div style="margin: 8px 0; line-height: 1.5; color: #333;">${escapeHtml(answer.content)}</div>
+                        <div style="display: flex; gap: 12px; align-items: center; font-size: 12px; color: #666;">
+                            <button onclick="voteAnswer('${questionId}', '${answer.answerId}', 'up')" style="background: none; border: none; cursor: ${isLoggedIn ? 'pointer' : 'not-allowed'}; padding: 4px; display: flex; align-items: center; gap: 4px;" ${!isLoggedIn ? 'disabled' : ''}>
+                                <i class="fas fa-thumbs-up"></i> ${voteCount}
+                            </button>
+                            <button onclick="voteAnswer('${questionId}', '${answer.answerId}', 'down')" style="background: none; border: none; cursor: ${isLoggedIn ? 'pointer' : 'not-allowed'}; padding: 4px; display: flex; align-items: center; gap: 4px;" ${!isLoggedIn ? 'disabled' : ''}>
+                                <i class="fas fa-thumbs-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updatePagination() {
+            const pagination = document.getElementById('pagination');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pageInfo = document.getElementById('pageInfo');
+
+            if (totalQuestionsCount === 0 || totalPages <= 1) {
+                pagination.style.display = 'none';
+                return;
+            }
+            pagination.style.display = 'flex';
+            prevBtn.disabled = currentPage <= 1;
+            nextBtn.disabled = currentPage >= totalPages;
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages} (${totalQuestionsCount} total)`;
+        }
+
+        function changePage(direction) {
+            const newPage = currentPage + direction;
+            if (newPage < 1 || newPage > totalPages) return;
+            currentPage = newPage;
+            loadQuestions();
+        }
+
+        async function handleVote(questionId, voteType) {
+            if (!currentUser) { showNotification('Please login to Like or Unlike.', 'warning'); return; }
+
+            const isCurrentlyLiked = userLikes.has(questionId);
+            let newVoteType = isCurrentlyLiked ? 'down' : 'up';
+
+            const targetCard = document.querySelector(`.q-card[data-index="${allQuestions.findIndex(q => q.questionId === questionId)}"]`);
+            const targetBtn = targetCard?.querySelector('button.upvote');
+            const originalHTML = targetBtn?.innerHTML;
+
+            if (targetBtn) { targetBtn.innerHTML = `<i class="fas fa-spinner fa-spin loading-spinner"></i> ...`; targetBtn.disabled = true; }
+
+            try {
+                const response = await fetch(`${API_URL}/votequestion`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ questionId, voteType: newVoteType, userId: currentUser.id })
+                });
+                if (!response.ok) {
+                    const errorDetails = await response.json().catch(() => ({}));
+                    throw new Error(errorDetails.error || `Failed to ${newVoteType === 'up' ? 'like' : 'unlike'}. Status: ${response.status}`);
+                }
+                const result = await response.json();
+                if (result.success) {
+                    if (newVoteType === 'up') { userLikes.add(questionId); showNotification(`Question liked! ❤️`); }
+                    else { userLikes.delete(questionId); showNotification(`Question unliked. 💔`); }
+                    localStorage.setItem(`userLikes_${currentUser.id}`, JSON.stringify([...userLikes]));
+                    loadQuestions();
+                } else {
+                    showNotification(result.error || `Failed to ${newVoteType === 'up' ? 'like' : 'unlike'}`, 'error');
+                }
+            } catch (error) {
+                if (DEBUG) console.error('Like/Unlike error:', error);
+                showNotification(`Error: ${error.message}`, 'error');
+            } finally {
+                if (targetBtn) { targetBtn.disabled = false; targetBtn.innerHTML = originalHTML; }
+            }
+        }
+
+        function toggleAnswers(questionId) {
+            const answerSection = document.getElementById(`answers-${questionId}`);
+            const questionCard = document.querySelector(`.q-card[data-index="${allQuestions.findIndex(q => q.questionId === questionId)}"]`);
+            const toggleButton = questionCard?.querySelector('.toggle-answers');
+
+            if (answerSection) {
+                const isHidden = answerSection.style.display !== 'block';
+                answerSection.style.display = isHidden ? 'block' : 'none';
+                if (toggleButton) {
+                    const answerCount = allQuestions.find(q => q.questionId === questionId)?.answers.length || 0;
+                    toggleButton.innerHTML = `<i class="fas fa-comment"></i> ${
+                        isHidden ? 'Hide Answers' : (answerCount === 0 ? 'Add Answer' : `View ${answerCount} Answer${answerCount !== 1 ? 's' : ''}`)
+                    }`;
+                }
+                if (isHidden) {
+                    setTimeout(() => { answerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
+                }
+            }
+        }
+
+        async function addAnswer(questionId) {
+            if (!currentUser) return;
+
+            const answerInput = document.querySelector(`.answer-input[data-question-id="${questionId}"]`);
+            const questionCard = document.querySelector(`.q-card[data-index="${allQuestions.findIndex(q => q.questionId === questionId)}"]`);
+            const postAnswerBtn = questionCard?.querySelector('.post-answer-btn');
+
+            if (!answerInput) return;
+            const content = answerInput.value.trim();
+            const originalHTML = postAnswerBtn?.innerHTML;
+
+            if (!content) { showNotification('Please write an answer', 'warning'); answerInput.focus(); return; }
+
+            if (postAnswerBtn) { postAnswerBtn.innerHTML = `<i class="fas fa-spinner fa-spin loading-spinner"></i> Posting...`; postAnswerBtn.disabled = true; }
+            answerInput.disabled = true;
+
+            try {
+                const userPhoto = currentUser?.profilePhotoUrl || '';
+                const answerData = { questionId, userId: currentUser.id, userName: currentUser.fullName, userPhoto, content };
+                const response = await fetch(`${API_URL}/addanswer`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(answerData)
+                });
+                if (!response.ok) {
+                    const errorDetails = await response.json().catch(() => ({}));
+                    throw new Error(errorDetails.error || `Failed to post. Status: ${response.status}`);
+                }
+                const result = await response.json();
+                if (result.success) {
+                    answerInput.value = '';
+                    showNotification('Answer posted successfully!');
+                    await loadQuestions();
+                    setTimeout(() => {
+                        const answerSection = document.getElementById(`answers-${questionId}`);
+                        if (answerSection) answerSection.style.display = 'block';
+                    }, 300);
+                } else {
+                    showNotification(result.error || 'Failed to post answer', 'error');
+                }
+            } catch (error) {
+                if (DEBUG) console.error('Add answer error:', error);
+                showNotification(`Error posting answer: ${error.message}`, 'error');
+            } finally {
+                if (postAnswerBtn) { postAnswerBtn.innerHTML = originalHTML; postAnswerBtn.disabled = false; }
+                answerInput.disabled = false;
+            }
+        }
+
+        async function acceptAnswer(questionId, answerId) {
+            if (!currentUser) return;
+            if (!confirm('Mark this answer as accepted? This will help others find the solution.')) return;
+
+            const targetBtn = document.querySelector(`.accept-answer-btn[data-question-id="${questionId}"][data-answer-id="${answerId}"]`);
+            const originalHTML = targetBtn?.innerHTML;
+
+            if (targetBtn) { targetBtn.innerHTML = `<i class="fas fa-spinner fa-spin loading-spinner"></i> ...`; targetBtn.disabled = true; }
+
+            try {
+                const response = await fetch(`${API_URL}/acceptanswer`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ questionId, answerId, userId: currentUser.id })
+                });
+                if (!response.ok) {
+                    const errorDetails = await response.json().catch(() => ({}));
+                    throw new Error(errorDetails.error || `Failed to accept. Status: ${response.status}`);
+                }
+                const result = await response.json();
+                if (result.success) {
+                    loadQuestions();
+                    showNotification('Answer accepted! Thank you for helping the community.');
+                } else {
+                    showNotification(result.error || 'Failed to accept answer', 'error');
+                }
+            } catch (error) {
+                if (DEBUG) console.error('Accept answer error:', error);
+                showNotification(`Error accepting answer: ${error.message}`, 'error');
+            } finally {
+                if (targetBtn) { targetBtn.innerHTML = originalHTML; targetBtn.disabled = false; }
+            }
+        }
+
+        async function voteAnswer(questionId, answerId, voteType) {
+            if (!currentUser) { showNotification('Please login to vote on answers', 'warning'); return; }
+
+            const originalHTML = `<i class="fas fa-thumbs-${voteType === 'up' ? 'up' : 'down'}"></i>`;
+            const targetBtn = document.querySelector(`.answer-list button[onclick*="voteAnswer('${questionId}', '${answerId}', '${voteType}')"]`);
+
+            if (targetBtn) { targetBtn.innerHTML = `<i class="fas fa-spinner fa-spin loading-spinner"></i>`; targetBtn.disabled = true; }
+
+            try {
+                const response = await fetch(`${API_URL}/voteanswer`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ questionId, answerId, voteType })
+                });
+                if (!response.ok) {
+                    const errorDetails = await response.json().catch(() => ({}));
+                    throw new Error(errorDetails.error || `Failed to vote. Status: ${response.status}`);
+                }
+                const result = await response.json();
+                if (result.success) {
+                    loadQuestions();
+                    showNotification(`Answer ${voteType === 'up' ? 'upvoted' : 'downvoted'}`);
+                } else {
+                    showNotification(result.error || 'Failed to vote on answer', 'error');
+                }
+            } catch (error) {
+                if (DEBUG) console.error('Vote answer error:', error);
+                showNotification(`Error voting on answer: ${error.message}`, 'error');
+            } finally {
+                if (targetBtn) { targetBtn.innerHTML = originalHTML; targetBtn.disabled = false; }
+            }
+        }
+
+        async function postQuestion() {
+            if (!currentUser) return;
+
+            const input = document.getElementById('questionInput');
+            const text = input.value.trim();
+            const askQuestionBtn = document.getElementById('askQuestionBtn');
+            const originalHTML = askQuestionBtn?.innerHTML;
+
+            if (!text || text.length < 10) {
+                showNotification('Please enter a question with at least 10 characters', 'warning');
+                input.focus();
+                return;
+            }
+
+            const tags = [...new Set(text.match(/#\w+/g) || [])].map(tag => tag.substring(1).toLowerCase());
+
+            if (askQuestionBtn) { askQuestionBtn.innerHTML = `<i class="fas fa-spinner fa-spin loading-spinner"></i> Asking...`; askQuestionBtn.disabled = true; }
+            input.disabled = true;
+
+            const questionData = {
+                userId: currentUser.id,
+                userName: currentUser.fullName,
+                userPhoto: currentUser.profilePhotoUrl,
+                title: text,
+                content: '',
+                tags: tags.slice(0, 5),
+                answers: [],
+                votes: 0,
+                views: 0
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/createquestion`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(questionData)
+                });
+                if (!response.ok) {
+                    const errorDetails = await response.json().catch(() => ({}));
+                    throw new Error(errorDetails.error || `Failed to post. Status: ${response.status}`);
+                }
+                const result = await response.json();
+                if (result.success) {
+                    input.value = '';
+                    currentPage = 1;
+                    currentSearch = '';
+                    document.getElementById('searchInput').value = '';
+                    await loadQuestions();
+                    showNotification(`Question posted successfully! (${tags.length > 0 ? `Tags: ${tags.join(', ')}` : ''})`);
+                } else {
+                    showNotification(result.error || 'Failed to post question', 'error');
+                }
+            } catch (error) {
+                if (DEBUG) console.error('Post question error:', error);
+                showNotification(`Error posting question: ${error.message}`, 'error');
+            } finally {
+                if (askQuestionBtn) { askQuestionBtn.innerHTML = originalHTML; askQuestionBtn.disabled = false; }
+                input.disabled = false;
+            }
+        }
+
+        function searchByTag(event, tag) {
+            event.stopPropagation();
+            currentSearch = tag;
+            currentPage = 1;
+            document.getElementById('searchInput').value = `#${tag}`;
+            loadQuestions();
+            showNotification(`Showing questions tagged with #${tag}`);
+        }
+
+        function searchByTopic(topic) {
+            currentSearch = topic;
+            currentPage = 1;
+            document.getElementById('searchInput').value = `#${topic}`;
+            loadQuestions();
+            showNotification(`Showing questions tagged with #${topic}`);
+        }
+
+        function clearSearch() {
+            currentSearch = '';
+            currentPage = 1;
+            document.getElementById('searchInput').value = '';
+            loadQuestions();
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('huddleUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function initCanvas() {
+            const canvas = document.getElementById('hero-canvas');
+            const ctx = canvas.getContext('2d');
+            function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+            const particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, radius: Math.random() * 2 + 1, opacity: Math.random() * 0.5 + 0.2 });
+            }
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0) p.x = canvas.width; if (p.x > canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = canvas.height; if (p.y > canvas.height) p.y = 0;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(0, 92, 151, ${p.opacity})`; ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        function autoDetectActivePage() {
+            const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
+            document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+                item.classList.toggle('active', item.getAttribute('data-page') === currentPage);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const pageRoutes = {
+                'mainpage': 'mainpage.html',
+                'profile': 'profile.html',
+                'qa': 'qa.html',
+                'discuss': 'discuss-room.html',
+                'groups': 'group-creationpage.html',
+                'notifications': 'notifications.html',
+                'chat': 'chatpage.html'
+            };
+            document.querySelectorAll('[data-page]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    if (pageRoutes[page]) window.location.href = pageRoutes[page];
+                });
+            });
+        });
+    </script>
+</body>
+</html>
